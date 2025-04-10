@@ -1,6 +1,3 @@
-# ✅ 완전히 고친 최종 Streamlit app.py 생성 (오류 없는 버전)
-
-correct_final_app = '''
 import streamlit as st
 import pandas as pd
 import gspread
@@ -44,8 +41,7 @@ if st.button("📥 데이터 조회 및 표 출력"):
         return group.sort_values('기준시점', ascending=False).head(n)
     grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
 
-    html = \"\"\"
-<html>
+    html = """<html>
 <head>
   <style>
     body { font-family: 'Malgun Gothic'; font-size: 10pt; color: #000; }
@@ -56,17 +52,9 @@ if st.button("📥 데이터 조회 및 표 출력"):
   <h3>✅ 데이터가 성공적으로 로딩되었습니다!</h3>
   <p>이곳에 향후 A4 표 형태 HTML 출력이 삽입될 예정입니다.</p>
 </body>
-</html>
-\"\"\"
+</html>"""
 
     components.html(html, height=400, scrolling=True)
 
 else:
     st.info("좌측 상단 '📥 데이터 조회 및 표 출력' 버튼을 눌러주세요.")
-'''
-
-# 저장
-with open("/mnt/data/app.py", "w", encoding="utf-8") as f:
-    f.write(correct_final_app.strip())
-
-"/mnt/data/app.py 파일 완성! 오류 없이 작동하는 Streamlit 웹앱 버전입니다. 업로드해서 실행해보세요."
