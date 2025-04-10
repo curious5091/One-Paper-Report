@@ -13,13 +13,22 @@ gc = gspread.authorize(credentials)
 
 st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
 
-st.markdown("<h1 style='font-size:24pt; margin-bottom:10pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
+st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
-col1, col2 = st.columns([1, 3])
-with col1:
-    run_button = st.button("📥 데이터 조회 및 표 출력", key="run_button")
-with col2:
-    st.markdown("<div style='margin-top:8px; font-size:10pt; color:#555;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
+st.markdown("""
+<div style="display: flex; align-items: center; gap: 1.5em; margin-bottom: 15px;">
+  <button onclick="window.print()" style="
+    padding:6px 12px;
+    font-size:10pt;
+    cursor:pointer;
+    border: 2px solid #333;
+    font-weight:bold;
+  ">📥 데이터 조회 및 표 출력</button>
+  <span style="font-size:10pt; color:#555;">made by curious@ibk.co.kr with ChatGPT</span>
+</div>
+""", unsafe_allow_html=True)
+run_button = True
 
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
@@ -112,9 +121,9 @@ if run_button:
             }
             th:first-child, td:first-child { border-left: none; }
             th:last-child, td:last-child { border-right: none; }
-            tr:first-child th { border-top: 2px solid black; }
+            tr:first-child th { border-top: 2px solid black; border-bottom: 2px solid black; }
             tr:last-child td { border-bottom: 2px solid black; }
-            tr:nth-child(2) th { border-bottom: 2px solid black; }
+            
 
             @media print {
               .print-button { display: none !important; }
