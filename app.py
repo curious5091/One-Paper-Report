@@ -82,6 +82,11 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
+            # ✅ 조회 후에만 국가 선택 드롭다운 표시
+            all_countries = sorted(set(k[0] for k in value_map.keys()), key=lambda x: country_order.get(x, 99))
+            selected_country = st.selectbox("국가를 선택하세요", ["전체 보기"] + all_countries)
+            countries_to_display = all_countries if selected_country == "전체 보기" else [selected_country]
+
             html = '''
             <html><head><style>
             @page { size: A4; margin: 5mm; }
@@ -107,7 +112,6 @@ if run_button:
             th:first-child, td:first-child { border-left: none; }
             th:last-child, td:last-child { border-right: none; }
             tr:first-child th { border-top: 2px solid black; border-bottom: 2px solid black; }
-
             @media print {
               .print-button { display: none !important; }
             }
@@ -121,18 +125,18 @@ if run_button:
             </div>
             '''
 
-            # 주요국 출력
-            for country in sorted(set(country_order) - emerging, key=lambda x: country_order[x]):
+            # 주요국 및 신흥국 국가별로 출력
+            for country in countries_to_display:
                 bg_color = color_map.get(country, '#ffffff')
                 html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
-                html += f'<h3 style="color:#000;">{country}</h3>'
+                html += f'<h3 style="color:#000;">{country if country not in emerging else "신흥국 - " + country}</h3>'
 
                 key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
                 if key_y in value_map or key_q in value_map:
                     periods_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1]
                     periods_q = sorted(value_map[key_q].keys(), reverse=True)[:8][::-1]
-                    label_y = format_label('GDP(연간)', *meta[key_y][:2])
-                    label_q = format_label('GDP(분기)', *meta[key_q][:2])
+                    label_y = format_label('GDP(연간)', *meta.get(key_y, ('%', '', ''))[:2])
+                    label_q = format_label('GDP(분기)', *meta.get(key_q, ('%', '', ''))[:2])
                     html += '<table><tr>'
                     html += f'<th colspan="{len(periods_y)}">{label_y}</th>'
                     html += f'<th colspan="{len(periods_q)}">{label_q}</th></tr>'
@@ -156,48 +160,11 @@ if run_button:
                     html += '</table>'
                 html += '</div>'
 
-            # 신흥국 GDP 병합 표
-            html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px;"><h3>신흥국</h3>'
-            gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
-            gdp_quarter = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(분기)'}
-            annual_periods = sorted({p for v in gdp_annual.values() for p in v}, reverse=True)[:4][::-1]
-            quarter_periods = sorted({p for v in gdp_quarter.values() for p in v}, reverse=True)[:8][::-1]
-            html += '<table><tr><th>국가</th>'
-            html += f'<th colspan="{len(annual_periods)}">{format_label("GDP(연간)", "%", "전동비")}</th>'
-            html += f'<th colspan="{len(quarter_periods)}">{format_label("GDP(분기)", "%", "전동비")}</th></tr>'
-            html += '<tr>' + ''.join(f'<th>{p}</th>' for p in annual_periods + quarter_periods) + '</tr>'
-            for country in sorted(emerging, key=lambda x: country_order.get(x, 99)):
-                html += '<tr style="border-bottom:2px solid black;"><td>' + country + '</td>'
-                html += ''.join(f'<td>{gdp_annual.get((country, "GDP(연간)"), {}).get(p, "")}</td>' for p in annual_periods)
-                html += ''.join(f'<td>{gdp_quarter.get((country, "GDP(분기)"), {}).get(p, "")}</td>' for p in quarter_periods)
-                html += '</tr>'
-            html += '</table>'
-
-            # 신흥국 기타 지표 병합 표
-            g_keys = [k for k in value_map if k[0] in emerging and k[1] not in ['GDP(연간)', 'GDP(분기)']]
-            all_periods = sorted({p for k in g_keys for p in value_map[k]}, reverse=True)[:6][::-1]
-            html += '<table><tr><th>국가</th><th>지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
-            last_country = None
-            rowspan = defaultdict(int)
-            for k in g_keys:
-                rowspan[k[0]] += 1
-            for i, k in enumerate(sorted(g_keys, key=lambda x: (country_order.get(x[0], 99), sort_order.get(x[1], 99)))):
-                unit, base, _ = meta[k]
-                html += f'<tr{" style=\"border-bottom:2px solid black;\"" if i == len(g_keys)-1 else ""}>'
-                if k[0] != last_country:
-                    html += f'<td rowspan="{rowspan[k[0]]}">{k[0]}</td>'
-                    last_country = k[0]
-                html += f'<td class="label">{format_label(k[1], unit, base)}</td>'
-                for p in all_periods:
-                    html += f'<td>{value_map[k].get(p, "")}</td>'
-                html += '</tr>'
-            html += '</table></div></body></html>'
-
-            components.html(html, height=1700, scrolling=True)
+            html += '</body></html>'
+            components.html(html, height=1800, scrolling=True)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
             st.exception(e)
-
 else:
     st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
