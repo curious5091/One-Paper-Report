@@ -93,15 +93,13 @@ if run_button or st.session_state.data_loaded:
                 st.session_state.data_loaded = True
 
             # ✅ 카테고리 선택 드롭박스 (다중 선택)
-            category_selection = st.multiselect("국가 카테고리를 선택하세요", ["한국", "미국", "중국", "일본", "유로존", "신흥국"], default=["한국", "미국", "중국", "일본", "유로존", "신흥국"])
+            category_selection = st.selectbox("국가 카테고리를 선택하세요", ["한국", "미국", "중국", "일본", "유로존", "신흥국"])
 
-            # 선택된 카테고리에 맞춰 데이터 출력
-            countries_to_display = []
-            if "신흥국" in category_selection:
-                countries_to_display += ['베트남', '폴란드', '인도네시아', '인도']
-            for country in category_selection:
-                if country != "신흥국":
-                    countries_to_display.append(country)
+            # 신흥국을 선택하면 신흥국 관련 데이터만 출력
+            if category_selection == "신흥국":
+                countries_to_display = ['베트남', '폴란드', '인도네시아', '인도']
+            else:
+                countries_to_display = [category_selection]
 
             html = '''
             <html><head><style>
