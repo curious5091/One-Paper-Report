@@ -71,6 +71,8 @@ if st.button("📥 데이터 조회 및 표 출력"):
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
             st.exception(e)
+            st.write("🔴 확인된 오류:")
+            st.write(e)
 
 else:
     st.info("좌측 상단 '📥 데이터 조회 및 표 출력' 버튼을 눌러주세요.")
