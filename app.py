@@ -17,7 +17,20 @@ emerging = ["베트남", "폴란드", "인도네시아", "인도"]
 all_countries = ["한국", "미국", "중국", "일본", "유로존"] + emerging
 
 # --- 커스텀 국가 선택 UI ---
-selected_countries = st.query_params.get("selected", ["전체 보기"])
+view_mode = st.radio("조회 방식", ["전체 보기", "일부 국가 선택"], horizontal=True)
+
+if view_mode == "전체 보기":
+    selected_countries = ["전체 보기"]
+else:
+    selected_countries = []
+    with st.expander("국가 선택", expanded=True):
+        for country in ["한국", "미국", "중국", "일본", "유로존", "신흥국"]:
+            if st.checkbox(country, key=f"check_{country}"):
+                selected_countries.append(country)
+
+    if not selected_countries:
+        st.warning("하나 이상의 국가를 선택해주세요.")
+        st.stop()
 components.html(r"""
 <div id=\"selector\">
   <div style=\"margin-bottom:10px;\"><b>국가 선택</b></div>
