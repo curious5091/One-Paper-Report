@@ -180,7 +180,8 @@ if run_button:
                 rowspan[k[0]] += 1
             for i, k in enumerate(sorted(g_keys, key=lambda x: (country_order.get(x[0], 99), sort_order.get(x[1], 99)))):
                 unit, base, _ = meta[k]
-                html += f'<tr{" style=\\"border-bottom:2px solid black;\\"" if i == len(g_keys)-1 else ""}>'
+                row_style = ' style="border-bottom:2px solid black;"' if i == len(g_keys)-1 else ''
+                html += f'<tr{row_style}>'
                 if k[0] != last_country:
                     html += f'<td rowspan="{rowspan[k[0]]}">{k[0]}</td>'
                     last_country = k[0]
