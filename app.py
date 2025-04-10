@@ -1,6 +1,6 @@
-# ✅ 로딩 중 메시지를 보여주는 st.spinner 추가된 버전 app.py 생성
+# ✅ Streamlit에 업로드 가능한 최종 app.py 내용 (파일 저장 없이 바로 실행 가능한 버전)
 
-spinner_version = '''
+streamlit_final_clean = '''
 import streamlit as st
 import pandas as pd
 import gspread
@@ -81,6 +81,6 @@ else:
 
 # 저장
 with open("/mnt/data/app.py", "w", encoding="utf-8") as f:
-    f.write(spinner_version.strip())
+    f.write(streamlit_final_clean.strip())
 
-"/mnt/data/app.py — 로딩 중 메시지 포함된 버전이 준비되었습니다!"
+"/mnt/data/app.py - Streamlit Cloud에서 안전하게 실행 가능한 최종 클린버전 저장 완료"
