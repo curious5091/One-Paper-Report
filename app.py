@@ -11,7 +11,7 @@ scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=scope)
 gc = gspread.authorize(credentials)
 
-# 기본 UI
+# UI
 st.set_page_config(page_title="국가별 경제지표 조회", layout="wide")
 st.title("📊 국가별 경제지표 A4 표 출력 뷰어")
 
@@ -48,7 +48,6 @@ if st.button("📥 데이터 조회 및 표 출력"):
 
             grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
 
-            # 설정
             omit_base = {'기준금리', '실업률'}
             sort_order = {
                 '기준금리': 0, '실업률': 1, 'PCE': 2, 'CPI': 3, 'PPI': 4, '무역수지': 5, '수출': 6, '수입': 7,
@@ -83,7 +82,6 @@ if st.button("📥 데이터 조회 및 표 출력"):
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            # HTML 시작
             html = '''
             <html><head><style>
             body { font-family: 'Malgun Gothic'; font-size: 10pt; color: #000; }
@@ -94,18 +92,13 @@ if st.button("📥 데이터 조회 및 표 출력"):
               text-align: center;
               color: #000;
             }
-            th:first-child, td:first-child {
-              border-left: none;
-            }
-            th:last-child, td:last-child {
-              border-right: none;
-            }
+            th:first-child, td:first-child { border-left: none; }
+            th:last-child, td:last-child { border-right: none; }
             tr:first-child th { border-top: 2px solid black; }
             tr:last-child td { border-bottom: 2px solid black; }
             tr:nth-child(2) th { border-bottom: 2px solid black; }
             </style></head><body>
             '''
-
             for country in sorted(set(country_order) - emerging, key=lambda x: country_order[x]):
                 bg_color = color_map.get(country, '#ffffff')
                 html += f'<div style="background-color:{bg_color}; padding:10px; margin-bottom:25px;">'
@@ -140,7 +133,6 @@ if st.button("📥 데이터 조회 및 표 출력"):
                     html += '</table>'
                 html += '</div>'
 
-            # 신흥국 블럭 시작
             html += f'<div style="background-color:{color_map["베트남"]}; padding:10px; margin-bottom:25px;"><h3>신흥국</h3>'
 
             gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
@@ -175,7 +167,17 @@ if st.button("📥 데이터 조회 및 표 출력"):
                 for p in all_periods:
                     html += f'<td>{value_map[k].get(p, "")}</td>'
                 html += '</tr>'
-            html += '</table></div></body></html>'
+            html += '</table>'
+
+            html += '''
+            <div style="text-align:right; margin-top:20px;">
+              <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer;">🖨️ 인쇄 또는 PDF 저장</button>
+              <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
+                👉 이 버튼을 누르면 출력창이 열리며, PDF로 저장하거나 프린터로 바로 인쇄할 수 있습니다.
+              </p>
+            </div>
+            </body></html>
+            '''
 
             components.html(html, height=1500, scrolling=True)
 
@@ -185,12 +187,4 @@ if st.button("📥 데이터 조회 및 표 출력"):
 
 else:
     st.info("👆 상단 '📥 데이터 조회 및 표 출력' 버튼을 눌러주세요.")
-
-<div style="text-align:right; margin-top:20px;">
-  <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer;">🖨️ 인쇄 또는 PDF 저장</button>
-  <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
-    👉 이 버튼을 누르면 출력창이 열리며, PDF로 저장하거나 프린터로 바로 인쇄할 수 있습니다.
-  </p>
-</div>
-</body></html>
 
