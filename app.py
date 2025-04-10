@@ -84,7 +84,7 @@ if run_button:
 
             html = '''
             <html><head><style>
-            @page { size: A4; margin: 5mm; }
+            @page { size: A4 portrait; margin: 5mm; }
             body {
               font-family: 'Malgun Gothic';
               font-size: 10pt;
@@ -121,7 +121,6 @@ if run_button:
             </div>
             '''
 
-            # 주요국 출력
             for country in sorted(set(country_order) - emerging, key=lambda x: country_order[x]):
                 bg_color = color_map.get(country, '#ffffff')
                 html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
@@ -156,7 +155,7 @@ if run_button:
                     html += '</table>'
                 html += '</div>'
 
-            # 신흥국 GDP 병합 표
+            # 신흥국 GDP 표 수정된 부분
             html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px;"><h3>신흥국</h3>'
             gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
             gdp_quarter = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(분기)'}
@@ -167,17 +166,17 @@ if run_button:
             html += f'<th colspan="{len(quarter_periods)}">{format_label("GDP(분기)", "%", "전동비")}</th></tr>'
             html += '<tr>' + ''.join(f'<th>{p}</th>' for p in annual_periods + quarter_periods) + '</tr>'
             for country in sorted(emerging, key=lambda x: country_order.get(x, 99)):
-            html += '<tr><td>' + country + '</td>'
-            html += ''.join(f'<td>{gdp_annual.get((country, "GDP(연간)"), {}).get(p, "")}</td>' for p in annual_periods)
-            html += ''.join('<td></td>' for _ in quarter_periods)
-            html += '</tr>'
-            html += '<tr style="border-bottom:2px solid black;"><td></td>'
-            html += ''.join('<td></td>' for _ in annual_periods)
-            html += ''.join(f'<td>{gdp_quarter.get((country, "GDP(분기)"), {}).get(p, "")}</td>' for p in quarter_periods)
-            html += '</tr>'
+                html += '<tr><td>' + country + '</td>'
+                html += ''.join(f'<td>{gdp_annual.get((country, "GDP(연간)"), {}).get(p, "")}</td>' for p in annual_periods)
+                html += ''.join('<td></td>' for _ in quarter_periods)
+                html += '</tr>'
+                html += '<tr style="border-bottom:2px solid black;"><td></td>'
+                html += ''.join('<td></td>' for _ in annual_periods)
+                html += ''.join(f'<td>{gdp_quarter.get((country, "GDP(분기)"), {}).get(p, "")}</td>' for p in quarter_periods)
+                html += '</tr>'
             html += '</table>'
 
-            # 신흥국 기타 지표 병합 표
+            # 신흥국 기타 지표 표
             g_keys = [k for k in value_map if k[0] in emerging and k[1] not in ['GDP(연간)', 'GDP(분기)']]
             all_periods = sorted({p for k in g_keys for p in value_map[k]}, reverse=True)[:6][::-1]
             html += '<table><tr><th>국가</th><th>지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
