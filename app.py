@@ -94,19 +94,21 @@ if run_button:
             table {
               border-collapse: collapse;
               width: 100%;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
               page-break-inside: avoid;
             }
             th, td {
               border: 1px solid black;
-              padding: 4px;
-              font-size: 9pt;
+              padding: 2px;
+              font-size: 8pt;
+              line-height: 1.2;
               text-align: center;
               color: #000;
             }
             th:first-child, td:first-child { border-left: none; }
             th:last-child, td:last-child { border-right: none; }
             tr:first-child th { border-top: 2px solid black; border-bottom: 2px solid black; }
+            .page-break { page-break-before: always; }
             @media print {
               .print-button { display: none !important; }
             }
@@ -119,43 +121,47 @@ if run_button:
             </div>
             '''
 
-            # 주요국 표 출력
-            for country in sorted(set(country_order) - emerging, key=lambda x: country_order[x]):
+            def render_country_block(country):
                 bg_color = color_map.get(country, '#ffffff')
-                html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
-                html += f'<h3 style="color:#000;">{country}</h3>'
-
+                block = f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px; page-break-inside: avoid;">'
+                block += f'<h3 style="color:#000;">{country}</h3>'
                 key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
                 if key_y in value_map or key_q in value_map:
                     periods_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1]
                     periods_q = sorted(value_map[key_q].keys(), reverse=True)[:8][::-1]
                     label_y = format_label('GDP(연간)', *meta[key_y][:2])
                     label_q = format_label('GDP(분기)', *meta[key_q][:2])
-                    html += '<table><tr>'
-                    html += f'<th colspan="{len(periods_y)}">{label_y}</th>'
-                    html += f'<th colspan="{len(periods_q)}">{label_q}</th></tr>'
-                    html += '<tr>' + ''.join(f'<th>{p}</th>' for p in periods_y + periods_q) + '</tr>'
-                    html += '<tr style="border-bottom:2px solid black;">'
-                    html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in periods_y)
-                    html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
-                    html += '</tr></table>'
-
+                    block += '<table><tr>'
+                    block += f'<th colspan="{len(periods_y)}">{label_y}</th>'
+                    block += f'<th colspan="{len(periods_q)}">{label_q}</th></tr>'
+                    block += '<tr>' + ''.join(f'<th>{p}</th>' for p in periods_y + periods_q) + '</tr>'
+                    block += '<tr style="border-bottom:2px solid black;">'
+                    block += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in periods_y)
+                    block += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
+                    block += '</tr></table>'
                 keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 6]
                 if keys6:
                     all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
-                    html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
+                    block += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
                     for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
                         unit, base, _ = meta[k]
                         row_style = ' style="border-bottom:2px solid black;"' if i == len(keys6)-1 else ''
-                        html += f'<tr{row_style}><td class="label">{format_label(k[1], unit, base)}</td>'
+                        block += f'<tr{row_style}><td class="label">{format_label(k[1], unit, base)}</td>'
                         for p in all_periods:
-                            html += f'<td>{value_map[k].get(p, "")}</td>'
-                        html += '</tr>'
-                    html += '</table>'
-                html += '</div>'
+                            block += f'<td>{value_map[k].get(p, "")}</td>'
+                        block += '</tr>'
+                    block += '</table>'
+                block += '</div>'
+                return block
 
-            # 신흥국 GDP 표
-            html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px;"><h3>신흥국</h3>'
+            for country in ['한국', '미국', '중국']:
+                html += render_country_block(country)
+
+            html += '<div class="page-break">'
+            for country in ['일본', '유로존']:
+                html += render_country_block(country)
+
+            html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px; page-break-inside: avoid;"><h3>신흥국</h3>'
             gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
             gdp_quarter = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(분기)'}
             annual_periods = sorted({p for v in gdp_annual.values() for p in v}, reverse=True)[:4][::-1]
@@ -175,7 +181,6 @@ if run_button:
                 html += '</tr>'
             html += '</table>'
 
-            # 신흥국 기타 지표 표
             keys_etc = [k for k in value_map if k[0] in emerging and k[1] not in ['GDP(연간)', 'GDP(분기)']]
             all_periods = sorted({p for k in keys_etc for p in value_map[k]}, reverse=True)[:6][::-1]
             html += '<table><tr><th>국가</th><th>지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
@@ -194,13 +199,11 @@ if run_button:
                     html += f'<td>{value_map[k].get(p, "")}</td>'
                 html += '</tr>'
             html += '</table></div>'
-            html += "</body></html>"
-
+            html += '</div></body></html>'
             components.html(html, height=1700, scrolling=True)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
             st.exception(e)
-
 else:
     st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
