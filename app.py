@@ -17,7 +17,7 @@ emerging = ["베트남", "폴란드", "인도네시아", "인도"]
 all_countries = ["한국", "미국", "중국", "일본", "유로존"] + emerging
 
 # --- 커스텀 국가 선택 UI ---
-selected_countries = st.experimental_get_query_params().get("selected", all_countries)
+selected_countries = st.query_params.get("selected", all_countries)
 components.html("""
 <div id=\"selector\">
   <div style=\"margin-bottom:10px;\"><b>국가 선택</b></div>
