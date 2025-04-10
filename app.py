@@ -25,7 +25,8 @@ st.markdown("""
     border: 2px solid #333;
     font-weight:bold;
   ">📥 데이터 조회 및 표 출력</button>
-  </div>
+  <span style="font-size:10pt; color:#555;">made by curious@ibk.co.kr with ChatGPT</span>
+</div>
 """, unsafe_allow_html=True)
 run_button = True
 
@@ -98,7 +99,7 @@ if run_button:
 
             html = '''
             <html><head><style>
-            @page { size: A4 landscape; margin: 10mm; }
+            @page { size: A4 landscape; margin: 5mm; }
             body {
               font-family: 'Malgun Gothic';
               font-size: 10pt;
@@ -108,7 +109,7 @@ if run_button:
             table {
               border-collapse: collapse;
               width: 100%;
-              margin-bottom: 20px;
+              margin-bottom: 10px;
               page-break-inside: avoid;
             }
             th, td {
@@ -139,7 +140,7 @@ if run_button:
 
             for country in sorted(set(country_order) - emerging, key=lambda x: country_order[x]):
                 bg_color = color_map.get(country, '#ffffff')
-                html += f'<div style="background-color:{bg_color}; padding:10px; margin-bottom:25px;">'
+                html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
                 html += f'<h3 style="color:#000;">{country}</h3>'
 
                 key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
@@ -171,7 +172,7 @@ if run_button:
                     html += '</table>'
                 html += '</div>'
 
-            html += f'<div style="background-color:{color_map["베트남"]}; padding:10px; margin-bottom:25px;"><h3>신흥국</h3>'
+            html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px;"><h3>신흥국</h3>'
 
             gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
             gdp_quarter = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(분기)'}
