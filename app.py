@@ -1,6 +1,3 @@
-# ✅ Streamlit 앱용 디버깅 진단 포함 app.py 생성
-
-debug_version = '''
 import streamlit as st
 import pandas as pd
 import gspread
@@ -54,7 +51,7 @@ if st.button("📥 데이터 조회 및 표 출력"):
         st.success(f"📌 grouped 데이터 생성 완료 — 총 {len(grouped)}행")
         st.dataframe(grouped.head(10))
 
-        html = \"\"\"<html>
+        html = """<html>
 <head>
   <style>
     body { font-family: 'Malgun Gothic'; font-size: 10pt; color: #000; }
@@ -65,7 +62,7 @@ if st.button("📥 데이터 조회 및 표 출력"):
   <h3>✅ HTML 출력 테스트</h3>
   <p>데이터 조회는 완료되었고, 이곳에 향후 A4 표 출력이 삽입됩니다.</p>
 </body>
-</html>\"\"\"
+</html>"""
 
         components.html(html, height=400, scrolling=True)
 
@@ -74,5 +71,3 @@ if st.button("📥 데이터 조회 및 표 출력"):
 
 else:
     st.info("좌측 상단 '📥 데이터 조회 및 표 출력' 버튼을 눌러주세요.")
-'''
-
