@@ -10,6 +10,7 @@ st.set_page_config(page_title="국가별 경제지표 조회", layout="wide")
 st.title("📊 국가별 경제지표 A4 표 출력 뷰어")
 
 if st.button("📥 데이터 조회 및 표 출력"):
+   st.success("✅ 버튼이 눌렸고 데이터 처리가 시작되었습니다!")
 
     creds, _ = default()
     gc = gspread.authorize(creds)
