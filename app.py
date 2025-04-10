@@ -1,20 +1,8 @@
-import streamlit as st
-import gspread
-from gspread_dataframe import get_as_dataframe
-import pandas as pd
-from collections import defaultdict
-from google.oauth2.service_account import Credentials
-import streamlit.components.v1 as components
-
-scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=scope)
-gc = gspread.authorize(credentials)
-
-st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
-st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
-st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
-
-run_button = st.button("📥 데이터 조회 및 출력")
+col1, col2, spacer, col3 = st.columns([1, 0.1, 0.1, 1])
+with col1:
+    run_button = st.button("📥 데이터 조회 및 출력")
+with col3:
+    print_trigger = st.button("🖨️ 인쇄 또는 PDF 저장")
 
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
@@ -82,8 +70,7 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            # ✅ 수정된 인쇄 버튼: Streamlit 버튼으로 대체
-            print_trigger = st.button("🖨️ 인쇄 또는 PDF 저장")
+            # ✅ 인쇄 버튼 로직 실행
             if print_trigger:
                 components.html("""
                     <script>
