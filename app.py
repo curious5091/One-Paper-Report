@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 import io
-import streamlit.components.v1 as components
 from datetime import datetime
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
 
@@ -10,8 +10,8 @@ st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
 st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
-# 버튼 행
-col1, col2, col3 = st.columns([1,1,1])
+# 버튼 배치
+col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     if st.button("📥 데이터 조회 및 출력"):
         st.session_state["triggered"] = True
@@ -31,10 +31,9 @@ sample_data = {
     ]
 }
 
-# 조회되었을 때만 출력
+# 조회 후에만 출력
 if st.session_state.get("triggered", False):
-
-    # 표 구성용 DataFrame (엑셀 저장용)
+    # 표 구성용 DataFrame
     df_dict = {"지표": [], "기준시점": [], "값": []}
     for i in range(2):
         for j, 시점 in enumerate(sample_data["값목록"][i]):
@@ -43,7 +42,7 @@ if st.session_state.get("triggered", False):
             df_dict["값"].append(sample_data["수치"][i][j])
     df_excel = pd.DataFrame(df_dict)
 
-    # 엑셀 다운로드 버튼 (스타일 통일)
+    # 엑셀 다운로드
     with col2:
         output = io.BytesIO()
         today = datetime.today().strftime('%Y%m%d')
@@ -51,46 +50,61 @@ if st.session_state.get("triggered", False):
         with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
             df_excel.to_excel(writer, index=False, sheet_name="미국")
         st.download_button("📥 엑셀 다운로드", data=output.getvalue(),
-                           file_name=filename, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                           file_name=filename,
+                           mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
     # 인쇄 버튼
     with col3:
         if st.button("🖨️ 인쇄 또는 PDF 저장"):
             components.html("""<script>window.print()</script>""", height=0)
 
-    # 표 HTML 출력
+    # HTML 표 생성 및 출력
     html = """
+    <html>
+    <head>
     <style>
-    @media print {
-        .element-container button, .stDownloadButton { display: none !important; }
+    @page { size: A4 portrait; margin: 10mm; }
+    body {
+        font-family: 'Malgun Gothic';
+        font-size: 10pt;
+        color: #000;
+        -webkit-print-color-adjust: exact;
+        transform: scale(0.7);
+        transform-origin: top left;
     }
     table {
         border-collapse: collapse;
         width: 100%;
         margin-bottom: 20px;
-        font-family: 'Malgun Gothic';
-        font-size: 10pt;
+        page-break-inside: avoid;
     }
     th, td {
         border: 1px solid black;
         padding: 6px;
         text-align: center;
+        font-size: 10pt;
     }
     th.label {
         text-align: left;
     }
+    @media print {
+        .element-container button, .stDownloadButton { display: none !important; }
+    }
     </style>
+    </head>
+    <body>
     <h3>미국</h3>
     <table><tr>
     """
-    for i in range(2):  # 연간, 분기
+
+    for i in range(2):  # GDP 연간/분기 병렬
         label = f"<b>{sample_data['지표'][i]}</b> <span style='font-weight:normal; font-size:8pt;'>({sample_data['단위'][i]}, {sample_data['기준점'][i]})</span>"
         html += f'<td><table><tr><th colspan="{len(sample_data["값목록"][i])}" class="label">{label}</th></tr>'
         html += '<tr>' + ''.join(f"<th>{p}</th>" for p in sample_data["값목록"][i]) + '</tr>'
         html += '<tr style="border-bottom:2px solid black;">' + ''.join(f"<td>{v}</td>" for v in sample_data["수치"][i]) + '</tr></table></td>'
-    html += '</tr></table>'
+    html += '</tr></table></body></html>'
 
-    components.html(html, height=450, scrolling=True)
+    components.html(html, height=600, scrolling=True)
 
 else:
     st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
