@@ -185,3 +185,12 @@ if st.button("📥 데이터 조회 및 표 출력"):
 
 else:
     st.info("👆 상단 '📥 데이터 조회 및 표 출력' 버튼을 눌러주세요.")
+
+<div style="text-align:right; margin-top:20px;">
+  <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer;">🖨️ 인쇄 또는 PDF 저장</button>
+  <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
+    👉 이 버튼을 누르면 출력창이 열리며, PDF로 저장하거나 프린터로 바로 인쇄할 수 있습니다.
+  </p>
+</div>
+</body></html>
+
