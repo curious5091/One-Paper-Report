@@ -10,10 +10,17 @@ scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=scope)
 gc = gspread.authorize(credentials)
 
-st.set_page_config(page_title="국가별 경제지표 조회", layout="wide")
-st.title("📊 국가별 경제지표 A4 표 출력 뷰어")
+st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
 
-if st.button("📥 데이터 조회 및 표 출력"):
+st.markdown("<h1 style='font-size:24pt; margin-bottom:10pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
+
+col1, col2 = st.columns([1, 3])
+with col1:
+    run_button = st.button("📥 데이터 조회 및 출력", key="run_button")
+with col2:
+    st.markdown("<div style='margin-top:8px; font-size:10pt; color:#555;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
+
+if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
 
         try:
@@ -82,11 +89,23 @@ if st.button("📥 데이터 조회 및 표 출력"):
 
             html = '''
             <html><head><style>
-            body { font-family: 'Malgun Gothic'; font-size: 10pt; color: #000; }
-            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+            @page { size: A4 landscape; margin: 10mm; }
+            body {
+              font-family: 'Malgun Gothic';
+              font-size: 10pt;
+              color: #000;
+              -webkit-print-color-adjust: exact;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              margin-bottom: 20px;
+              page-break-inside: avoid;
+            }
             th, td {
               border: 1px solid black;
-              padding: 6px;
+              padding: 4px;
+              font-size: 9pt;
               text-align: center;
               color: #000;
             }
@@ -102,7 +121,7 @@ if st.button("📥 데이터 조회 및 표 출력"):
             </style></head><body>
 
             <div class="print-button" style="text-align:right; margin: 10px 0;">
-              <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer;">🖨️ 인쇄 또는 PDF 저장</button>
+              <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;">🖨️ 인쇄 또는 PDF 저장</button>
               <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
                 👉 이 버튼을 누르면 출력창이 열리며, PDF로 저장하거나 프린터로 바로 인쇄할 수 있습니다.
               </p>
@@ -186,4 +205,4 @@ if st.button("📥 데이터 조회 및 표 출력"):
             st.exception(e)
 
 else:
-    st.info("👆 상단 '📥 데이터 조회 및 표 출력' 버튼을 눌러주세요.")
+    st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
