@@ -7,7 +7,6 @@ from google.auth.transport.requests import AuthorizedSession
 from google.auth import default
 from collections import defaultdict
 import datetime
-from st_aggrid import AgGrid
 import streamlit.components.v1 as components
 
 st.set_page_config(page_title="국가별 경제지표 조회", layout="wide")
