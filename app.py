@@ -149,7 +149,7 @@ if run_button:
                     html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
                     for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
                         unit, base, _ = meta[k]
-                        html += f'<tr{" style=\\"border-bottom:2px solid black;\\"" if i == len(keys6)-1 else ""}>'
+                        html += f'<tr{" style=\"border-bottom:2px solid black;\"" if i == len(keys6)-1 else ""}>'
                         html += f'<td class="label">{format_label(k[1], unit, base)}</td>'
                         for p in all_periods:
                             html += f'<td>{value_map[k].get(p, "")}</td>'
