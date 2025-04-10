@@ -1,5 +1,3 @@
-# 전체 app.py 코드 시작
-
 import streamlit as st
 import gspread
 from gspread_dataframe import get_as_dataframe
@@ -10,28 +8,19 @@ import streamlit.components.v1 as components
 import io
 from datetime import datetime
 
-# 인증
 scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=scope)
 gc = gspread.authorize(credentials)
 
-# 페이지 설정
 st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
 st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
-# 버튼
-col1, col2, col3 = st.columns([2, 2, 2])
+col1, col2 = st.columns([2, 2])
 with col1:
     run_button = st.button("📥 데이터 조회 및 출력")
 with col2:
     download_slot = st.empty()
-with col3:
-    st.markdown("""
-    <div class="print-button" style="text-align:right;">
-        <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;">🖨️ 인쇄 또는 PDF 저장</button>
-    </div>
-    """, unsafe_allow_html=True)
 
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
@@ -65,7 +54,7 @@ if run_button:
 
             grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
 
-            # 엑셀 다운로드
+            # 엑셀 다운로드 버튼
             output = io.BytesIO()
             today = datetime.today().strftime('%Y%m%d')
             excel_filename = f"One Page Economy Report_{today}.xlsx"
@@ -78,8 +67,53 @@ if run_button:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-            # 이후 HTML 표 출력은 이 자리에 표 생성 코드를 삽입해 확장 가능
-            st.success("✅ 데이터 로딩 완료 — 표 출력 준비됨.")
+            # 인쇄 버튼도 조회 후에 표시
+            st.markdown("""
+            <div class="print-button" style="text-align:right; margin: 10px 0;">
+              <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;">🖨️ 인쇄 또는 PDF 저장</button>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # 표 생성 영역 (테스트용)
+            html = '''
+            <html><head><style>
+            @page { size: A4 landscape; margin: 5mm; }
+            body {
+              font-family: 'Malgun Gothic';
+              font-size: 10pt;
+              color: #000;
+              -webkit-print-color-adjust: exact;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              margin-bottom: 10px;
+              page-break-inside: avoid;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 4px;
+              font-size: 9pt;
+              text-align: center;
+              color: #000;
+            }
+            th:first-child, td:first-child { border-left: none; }
+            th:last-child, td:last-child { border-right: none; }
+            tr:first-child th { border-top: 2px solid black; border-bottom: 2px solid black; }
+            @media print {
+              .print-button { display: none !important; }
+            }
+            </style></head><body>
+            '''
+
+            html += '<h3 style="color:#000;">📌 표 예시 영역 (데이터 정상 조회됨)</h3>'
+            html += '<table><tr><th>국가</th><th>지표</th><th>기준시점</th><th>값</th></tr>'
+            for _, row in grouped.head(10).iterrows():
+                html += f"<tr><td>{row['국가']}</td><td>{row['지표']}</td><td>{row['기준시점_text']}</td><td>{row['값']}</td></tr>"
+            html += '</table></body></html>'
+
+            # 결과 출력
+            components.html(html, height=600, scrolling=True)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
