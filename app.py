@@ -82,18 +82,14 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            # ✅ 조회 후에만 다중 국가 선택 드롭박스 표시
-            all_countries = sorted(set(k[0] for k in value_map.keys()), key=lambda x: country_order.get(x, 99))
-
-            # 주요국과 신흥국을 구분하여 드롭박스에 표시
-            major_countries = [country for country in all_countries if country not in emerging]
-            emerging_countries = [country for country in all_countries if country in emerging]
-
-            selected_major_countries = st.multiselect("주요국을 선택하세요", major_countries, default=major_countries)
-            selected_emerging_countries = st.multiselect("신흥국을 선택하세요", emerging_countries, default=emerging_countries)
-
-            # 선택된 국가들로 필터링
-            countries_to_display = selected_major_countries + selected_emerging_countries
+            # ✅ 조회 후에만 카테고리 선택 드롭박스 표시
+            category_selection = st.selectbox("국가 카테고리를 선택하세요", ["한국", "미국", "중국", "일본", "유로존", "신흥국"])
+            
+            # 신흥국을 선택하면 관련 국가 데이터 출력
+            if category_selection == "신흥국":
+                countries_to_display = ['베트남', '폴란드', '인도네시아', '인도']
+            else:
+                countries_to_display = [category_selection]
 
             html = '''
             <html><head><style>
@@ -133,11 +129,11 @@ if run_button:
             </div>
             '''
 
-            # 주요국 및 신흥국 국가별로 출력
+            # 선택된 카테고리(주요국 또는 신흥국)에 해당하는 국가 데이터만 출력
             for country in countries_to_display:
                 bg_color = color_map.get(country, '#ffffff')
                 html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
-                html += f'<h3 style="color:#000;">{country if country not in emerging else "신흥국 - " + country}</h3>'
+                html += f'<h3 style="color:#000;">{country}</h3>'
 
                 key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
                 if key_y in value_map or key_q in value_map:
