@@ -17,7 +17,8 @@ emerging = ["베트남", "폴란드", "인도네시아", "인도"]
 all_countries = ["한국", "미국", "중국", "일본", "유로존"] + emerging
 
 # --- 커스텀 국가 선택 UI ---
-components.html(f"""
+selected_countries = st.experimental_get_query_params().get("selected", all_countries)
+components.html("""
 <div id=\"selector\">
   <div style=\"margin-bottom:10px;\"><b>국가 선택</b></div>
   <button class=\"toggle\" data-name=\"전체 보기\">전체 보기</button>
@@ -34,7 +35,7 @@ components.html(f"""
       : selected.includes("신흥국") 
         ? selected.filter(x => x !== "전체 보기").concat({emerging}) 
         : selected;
-    Streamlit.setComponentValue([...new Set(message)]);
+    window.parent.postMessage({ type: 'streamlit:setComponentValue', value: message }, '*');
   }}
 
   buttons.forEach(btn => {{
@@ -89,7 +90,7 @@ components.html(f"""
 run_button = st.button("데이터 조회 및 출력")
 
 if run_button:
-    if 'selected_countries' not in st.session_state or not st.session_state.selected_countries:
+    if not selected_countries:
         st.warning("1개 이상의 국가를 선택해주세요.")
         st.stop()
 
@@ -144,7 +145,7 @@ if run_button:
     value_map = defaultdict(dict)
     meta = {}
     for _, row in grouped.iterrows():
-        if row['국가'] not in st.session_state.selected_countries:
+        if row['국가'] not in selected_countries:
             continue
         key = (row['국가'], row['지표'])
         meta[key] = (row['단위'], row['기준점'], row['빈도'])
@@ -167,4 +168,4 @@ if run_button:
     </div>
     '''
 
-    html += '<p style="margin-top:20px;">선택된 국가 수: ' + str(len(st.session_state.selected_countries)) + '</p>'
+    html += '<p style="margin-top:20px;">선택된 국가 수: ' + str(len(selected_countries)) + '</p>'
