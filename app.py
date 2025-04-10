@@ -82,10 +82,10 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            # ✅ 조회 후에만 국가 선택 드롭다운 표시
+            # ✅ 조회 후에만 다중 국가 선택 드롭박스 표시
             all_countries = sorted(set(k[0] for k in value_map.keys()), key=lambda x: country_order.get(x, 99))
-            selected_country = st.selectbox("국가를 선택하세요", ["전체 보기"] + all_countries)
-            countries_to_display = all_countries if selected_country == "전체 보기" else [selected_country]
+            selected_countries = st.multiselect("국가를 선택하세요 (중복 선택 가능)", all_countries, default=all_countries)
+            countries_to_display = selected_countries if selected_countries else all_countries
 
             html = '''
             <html><head><style>
