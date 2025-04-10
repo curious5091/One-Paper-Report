@@ -17,7 +17,7 @@ st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Pag
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
 # ✅ 버튼 2개 나란히 배치 (조회 / 인쇄)
-col1, spacer, col2 = st.columns([1, 0.05, 1])
+col1, spacer, col2 = st.columns([1, 0.005, 1])
 with col1:
     run_button = st.button("📥 데이터 조회 및 출력")
 with col2:
