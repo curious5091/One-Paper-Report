@@ -76,8 +76,3 @@ else:
     st.info("좌측 상단 '📥 데이터 조회 및 표 출력' 버튼을 눌러주세요.")
 '''
 
-# 저장
-with open("/mnt/data/app.py", "w", encoding="utf-8") as f:
-    f.write(debug_version.strip())
-
-"/mnt/data/app.py - 디버깅용 진단 포함 버전 저장 완료!"
