@@ -8,7 +8,7 @@ from collections import defaultdict
 
 # --- 기본 설정 ---
 st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
-st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>\ud83d\udcca IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
 # --- 국가 목록 정의 ---
@@ -86,11 +86,11 @@ selected = components.html(f"""
 """, height=180, key="country_selector", default=[])
 
 # --- 조회 버튼 ---
-run_button = st.button("\ud83d\udcc5 \ub370\uc774\ud130 \uc870\ud68c \ubc0f \ucd9c\ub825")
+run_button = st.button("📥 데이터 조회 및 출력")
 
 if run_button:
     if not selected:
-        st.warning("1\uac1c \uc774\uc0c1\uc758 \uad6d\uac00\ub97c \uc120\ud0dd\ud574\uc8fc\uc138\uc694.")
+        st.warning("1개 이상의 국가를 선택해주세요.")
         st.stop()
 
     # --- 인증 및 데이터 로딩 ---
@@ -171,4 +171,4 @@ if run_button:
     html += '</body></html>'
     components.html(html, height=1800, scrolling=True)
 else:
-    st.info("👆  상단 \"\ud83d\udcc5 \ub370\uc774\ud130 \uc870\ud68c \ubc0f \ucd9c\ub825\" \ubc84\ud2bc\uc744 \ub204\ub974\uc138\uc694.")
+    st.info("👆  상단 \"📥 데이터 조회 및 출력\" 버튼을 눌러주세요.")
