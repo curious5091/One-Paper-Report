@@ -167,8 +167,4 @@ if run_button:
     </div>
     '''
 
-    html += '<p style="margin-top:20px;">선택된 국가 수: ' + str(len(st.session_state.selected_countries)) + '</p>'"margin-top:20px;">선택된 국가 수: ' + str(len(selected)) + '</p>'
-    html += '</body></html>'
-    components.html(html, height=1800, scrolling=True)
-else:
-    st.info("상단 '데이터 조회 및 출력' 버튼을 눌러주세요.")
+    html += '<p style="margin-top:20px;">선택된 국가 수: ' + str(len(st.session_state.selected_countries)) + '</p>'
