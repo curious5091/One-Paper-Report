@@ -84,8 +84,16 @@ if run_button:
 
             # ✅ 조회 후에만 다중 국가 선택 드롭박스 표시
             all_countries = sorted(set(k[0] for k in value_map.keys()), key=lambda x: country_order.get(x, 99))
-            selected_countries = st.multiselect("국가를 선택하세요 (중복 선택 가능)", all_countries, default=all_countries)
-            countries_to_display = selected_countries if selected_countries else all_countries
+
+            # 주요국과 신흥국을 구분하여 드롭박스에 표시
+            major_countries = [country for country in all_countries if country not in emerging]
+            emerging_countries = [country for country in all_countries if country in emerging]
+
+            selected_major_countries = st.multiselect("주요국을 선택하세요", major_countries, default=major_countries)
+            selected_emerging_countries = st.multiselect("신흥국을 선택하세요", emerging_countries, default=emerging_countries)
+
+            # 선택된 국가들로 필터링
+            countries_to_display = selected_major_countries + selected_emerging_countries
 
             html = '''
             <html><head><style>
