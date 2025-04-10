@@ -11,7 +11,6 @@ credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=sc
 gc = gspread.authorize(credentials)
 
 st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
-
 st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
@@ -108,7 +107,6 @@ if run_button:
             th:first-child, td:first-child { border-left: none; }
             th:last-child, td:last-child { border-right: none; }
             tr:first-child th { border-top: 2px solid black; border-bottom: 2px solid black; }
-            tr:last-child td { border-bottom: 2px solid black !important; }
 
             @media print {
               .print-button { display: none !important; }
@@ -123,24 +121,24 @@ if run_button:
             </div>
             '''
 
-            # 국가별 표 출력
-            for country in sorted(set(country_order) - emerging, key=lambda x: country_order[x]):
-                bg_color = color_map[country]
+            # 주요국 표
+            for country in sorted(set(country_order) - emerging, key=lambda x: country_order.get(x, 99)):
+                bg_color = color_map.get(country, '#ffffff')
                 html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
                 html += f'<h3 style="color:#000;">{country}</h3>'
 
                 key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
                 if key_y in value_map or key_q in value_map:
-                    periods_y = sorted(value_map.get(key_y, {}).keys(), reverse=True)[:4][::-1]
-                    periods_q = sorted(value_map.get(key_q, {}).keys(), reverse=True)[:8][::-1]
-                    label1 = format_label('GDP(연간)', *meta.get(key_y, ("", "", ""))[:2])
-                    label2 = format_label('GDP(분기)', *meta.get(key_q, ("", "", ""))[:2])
+                    py = sorted(value_map.get(key_y, {}).keys(), reverse=True)[:4][::-1]
+                    pq = sorted(value_map.get(key_q, {}).keys(), reverse=True)[:8][::-1]
+                    label_y = format_label('GDP(연간)', *meta[key_y][:2]) if key_y in meta else ""
+                    label_q = format_label('GDP(분기)', *meta[key_q][:2]) if key_q in meta else ""
                     html += '<table><tr>'
-                    html += f'<th colspan="{len(periods_y)}">{label1}</th>'
-                    html += f'<th colspan="{len(periods_q)}">{label2}</th></tr>'
-                    html += '<tr>' + ''.join(f'<th>{p}</th>' for p in periods_y + periods_q) + '</tr><tr>'
-                    html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in periods_y)
-                    html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
+                    html += f'<th colspan="{len(py)}">{label_y}</th>'
+                    html += f'<th colspan="{len(pq)}">{label_q}</th></tr>'
+                    html += '<tr>' + ''.join(f'<th>{p}</th>' for p in py + pq) + '</tr><tr>'
+                    html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in py)
+                    html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in pq)
                     html += '</tr></table>'
 
                 keys6 = [k for k in value_map if k[0] == country and len(value_map[k]) == 6 and k[1] not in ['GDP(연간)', 'GDP(분기)']]
@@ -149,14 +147,18 @@ if run_button:
                     html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
                     for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
                         unit, base, _ = meta[k]
-                        html += f'<tr{" style=\"border-bottom:2px solid black;\"" if i == len(keys6)-1 else ""}>'
-                        html += f'<td class="label">{format_label(k[1], unit, base)}</td>'
+                        row_style = ' style="border-bottom:2px solid black;"' if i == len(keys6)-1 else ''
+                        html += f'<tr{row_style}><td class="label">{format_label(k[1], unit, base)}</td>'
                         for p in all_periods:
                             html += f'<td>{value_map[k].get(p, "")}</td>'
                         html += '</tr>'
                     html += '</table>'
                 html += '</div>'
 
+            # 신흥국 통합 표 (이전 코드에서 누락되었던 부분 복원 필요 시 추가 가능)
+            # ...
+
+            html += '</body></html>'
             components.html(html, height=1600, scrolling=True)
 
         except Exception as e:
