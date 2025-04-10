@@ -6,6 +6,7 @@ from collections import defaultdict
 from google.oauth2.service_account import Credentials
 import streamlit.components.v1 as components
 
+# Google Sheets 인증
 scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=scope)
 gc = gspread.authorize(credentials)
@@ -92,16 +93,20 @@ if run_button or st.session_state.data_loaded:
                 # 데이터가 로딩되었음을 표시
                 st.session_state.data_loaded = True
 
-            # ✅ 카테고리 선택 드롭박스 (다중 선택)
-            category_selection = st.selectbox("국가 카테고리를 선택하세요", ["한국", "미국", "중국", "일본", "유로존", "신흥국"])
+            # ✅ 다중 드롭박스 (국가 카테고리 선택)
+            category_selection = st.multiselect("국가 카테고리를 선택하세요", 
+                                               ["한국", "미국", "중국", "일본", "유로존", "신흥국"], 
+                                               default=["한국", "미국", "중국", "일본", "유로존", "신흥국"])
 
             # 신흥국을 선택하면 신흥국 관련 데이터만 출력
-            if category_selection == "신흥국":
-                countries_to_display = ['베트남', '폴란드', '인도네시아', '인도']
-                bg_color = "#f3f3f3"  # 신흥국은 특정 색상을 지정
-            else:
-                countries_to_display = [category_selection]
-                bg_color = color_map.get(category_selection, '#ffffff')
+            countries_to_display = []
+            if "신흥국" in category_selection:
+                countries_to_display += ['베트남', '폴란드', '인도네시아', '인도']
+            
+            # 선택된 국가들에 대해 출력
+            for country in category_selection:
+                if country != "신흥국":
+                    countries_to_display.append(country)
 
             html = '''
             <html><head><style>
@@ -143,6 +148,7 @@ if run_button or st.session_state.data_loaded:
 
             # 선택된 카테고리(주요국 또는 신흥국)에 해당하는 국가 데이터만 출력
             for country in countries_to_display:
+                bg_color = color_map.get(country, '#ffffff') if country != "신흥국" else "#f3f3f3"  # 신흥국은 색상 적용 X
                 html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
                 html += f'<h3 style="color:#000;">{country}</h3>'
 
