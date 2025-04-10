@@ -38,7 +38,6 @@ if st.button("📥 데이터 조회 및 표 출력"):
                 return d.strftime('%Y-%m')
 
             df['기준시점_text'] = df.apply(format_period, axis=1)
-
             df_sorted = df.sort_values(['국가', '지표', '기준시점', '발표일'], ascending=[True, True, False, False])
             df_deduped = df_sorted.drop_duplicates(subset=['국가', '지표', '기준시점_text'], keep='first')
 
@@ -49,6 +48,7 @@ if st.button("📥 데이터 조회 및 표 출력"):
 
             grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
 
+            # 설정
             omit_base = {'기준금리', '실업률'}
             sort_order = {
                 '기준금리': 0, '실업률': 1, 'PCE': 2, 'CPI': 3, 'PPI': 4, '무역수지': 5, '수출': 6, '수입': 7,
@@ -83,13 +83,23 @@ if st.button("📥 데이터 조회 및 표 출력"):
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
+            # HTML 시작
             html = '''
             <html><head><style>
             body { font-family: 'Malgun Gothic'; font-size: 10pt; color: #000; }
             table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-            th, td { border: 1px solid black; padding: 6px; text-align: center; color: #000; border-left: none; border-right: none; }
-            th.label { text-align: left; }
-            td.label { text-align: left; }
+            th, td {
+              border: 1px solid black;
+              padding: 6px;
+              text-align: center;
+              color: #000;
+            }
+            th:first-child, td:first-child {
+              border-left: none;
+            }
+            th:last-child, td:last-child {
+              border-right: none;
+            }
             tr:first-child th { border-top: 2px solid black; }
             tr:last-child td { border-bottom: 2px solid black; }
             tr:nth-child(2) th { border-bottom: 2px solid black; }
@@ -130,6 +140,7 @@ if st.button("📥 데이터 조회 및 표 출력"):
                     html += '</table>'
                 html += '</div>'
 
+            # 신흥국 블럭 시작
             html += f'<div style="background-color:{color_map["베트남"]}; padding:10px; margin-bottom:25px;"><h3>신흥국</h3>'
 
             gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
