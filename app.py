@@ -98,8 +98,10 @@ if run_button or st.session_state.data_loaded:
             # 신흥국을 선택하면 신흥국 관련 데이터만 출력
             if category_selection == "신흥국":
                 countries_to_display = ['베트남', '폴란드', '인도네시아', '인도']
+                bg_color = "#f3f3f3"  # 신흥국은 특정 색상을 지정
             else:
                 countries_to_display = [category_selection]
+                bg_color = color_map.get(category_selection, '#ffffff')
 
             html = '''
             <html><head><style>
@@ -141,7 +143,6 @@ if run_button or st.session_state.data_loaded:
 
             # 선택된 카테고리(주요국 또는 신흥국)에 해당하는 국가 데이터만 출력
             for country in countries_to_display:
-                bg_color = color_map.get(country, '#ffffff')
                 html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
                 html += f'<h3 style="color:#000;">{country}</h3>'
 
