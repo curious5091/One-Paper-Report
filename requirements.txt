@@ -3,3 +3,4 @@ gspread
 gspread_dataframe
 pandas
 google-auth
+xlsxwriter
