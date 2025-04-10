@@ -123,13 +123,41 @@ if run_button:
             </div>
             '''
 
-            # 표 생성 로직 (생략 가능 시 생략 또는 이어서 넣기)
-            # (value_map, meta 사용한 국가별 출력 + 신흥국 + 기타 지표 처리)
+            # 국가별 표 출력
+            for country in sorted(set(country_order) - emerging, key=lambda x: country_order[x]):
+                bg_color = color_map[country]
+                html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
+                html += f'<h3 style="color:#000;">{country}</h3>'
 
-            # 마지막 표 생성 시 마지막 행에 수동 스타일 추가 예시:
-            # html += '<tr style="border-bottom:2px solid black;">...</tr>'
+                key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
+                if key_y in value_map or key_q in value_map:
+                    periods_y = sorted(value_map.get(key_y, {}).keys(), reverse=True)[:4][::-1]
+                    periods_q = sorted(value_map.get(key_q, {}).keys(), reverse=True)[:8][::-1]
+                    label1 = format_label('GDP(연간)', *meta.get(key_y, ("", "", ""))[:2])
+                    label2 = format_label('GDP(분기)', *meta.get(key_q, ("", "", ""))[:2])
+                    html += '<table><tr>'
+                    html += f'<th colspan="{len(periods_y)}">{label1}</th>'
+                    html += f'<th colspan="{len(periods_q)}">{label2}</th></tr>'
+                    html += '<tr>' + ''.join(f'<th>{p}</th>' for p in periods_y + periods_q) + '</tr><tr>'
+                    html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in periods_y)
+                    html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
+                    html += '</tr></table>'
 
-            components.html(html, height=1500, scrolling=True)
+                keys6 = [k for k in value_map if k[0] == country and len(value_map[k]) == 6 and k[1] not in ['GDP(연간)', 'GDP(분기)']]
+                if keys6:
+                    all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
+                    html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
+                    for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
+                        unit, base, _ = meta[k]
+                        html += f'<tr{" style=\\"border-bottom:2px solid black;\\"" if i == len(keys6)-1 else ""}>'
+                        html += f'<td class="label">{format_label(k[1], unit, base)}</td>'
+                        for p in all_periods:
+                            html += f'<td>{value_map[k].get(p, "")}</td>'
+                        html += '</tr>'
+                    html += '</table>'
+                html += '</div>'
+
+            components.html(html, height=1600, scrolling=True)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
