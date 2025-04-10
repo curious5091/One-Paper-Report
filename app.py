@@ -27,7 +27,7 @@ st.markdown("""
   ">📥 데이터 조회 및 표 출력</button>
   </div>
 """, unsafe_allow_html=True)
-run_button = True
+run_button = st.button("📥 데이터 조회 및 출력")
 
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
