@@ -8,7 +8,7 @@ from collections import defaultdict
 
 # --- 기본 설정 ---
 st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
-st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
 # --- 국가 목록 정의 ---
@@ -86,7 +86,7 @@ selected = components.html(f"""
 """, height=180, key="country_selector", default=[])
 
 # --- 조회 버튼 ---
-run_button = st.button("📥 데이터 조회 및 출력")
+run_button = st.button("데이터 조회 및 출력")
 
 if run_button:
     if not selected:
@@ -163,7 +163,7 @@ if run_button:
     @media print { .print-button { display: none !important; } }
     </style></head><body>
     <div class="print-button" style="text-align:right; margin: 10px 0;">
-      <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;">🖨️ 인쇄 또는 PDF 저장</button>
+      <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;">인쇄 또는 PDF 저장</button>
     </div>
     '''
 
@@ -171,4 +171,4 @@ if run_button:
     html += '</body></html>'
     components.html(html, height=1800, scrolling=True)
 else:
-    st.info("👆  상단 \"📥 데이터 조회 및 출력\" 버튼을 눌러주세요.")
+    st.info("👆  상단 \"데이터 조회 및 출력\" 버튼을 눌러주세요.")
