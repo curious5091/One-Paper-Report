@@ -14,6 +14,9 @@ st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
 st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
+orientation = st.selectbox("출력 방향을 선택하세요", ["세로", "가로"], index=1, help="PDF 저장 또는 인쇄 시 방향 설정")
+page_orientation = "portrait" if orientation == "세로" else "landscape"
+
 run_button = st.button("📥 데이터 조회 및 출력")
 
 if run_button:
@@ -82,35 +85,32 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            html = '''
+            html = f'''
             <html><head><style>
-            @page { size: A4 landscape; margin: 5mm; }
-            body {
+            @page {{ size: A4 {page_orientation}; margin: 5mm; }}
+            body {{
               font-family: 'Malgun Gothic';
               font-size: 10pt;
               color: #000;
               -webkit-print-color-adjust: exact;
-            }
-            table {
+            }}
+            table {{
               border-collapse: collapse;
               width: 100%;
               margin-bottom: 10px;
               page-break-inside: avoid;
-            }
-            th, td {
+            }}
+            th, td {{
               border: 1px solid black;
               padding: 4px;
               font-size: 9pt;
               text-align: center;
               color: #000;
-            }
-            th:first-child, td:first-child { border-left: none; }
-            th:last-child, td:last-child { border-right: none; }
-            tr:first-child th { border-top: 2px solid black; border-bottom: 2px solid black; }
-
-            @media print {
-              .print-button { display: none !important; }
-            }
+            }}
+            th:first-child, td:first-child {{ border-left: none; }}
+            th:last-child, td:last-child {{ border-right: none; }}
+            tr:first-child th {{ border-top: 2px solid black; border-bottom: 2px solid black; }}
+            @media print {{ .print-button {{ display: none !important; }} }}
             </style></head><body>
 
             <div class="print-button" style="text-align:right; margin: 10px 0;">
@@ -121,7 +121,6 @@ if run_button:
             </div>
             '''
 
-            # 주요국 출력
             for country in sorted(set(country_order) - emerging, key=lambda x: country_order[x]):
                 bg_color = color_map.get(country, '#ffffff')
                 html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px;">'
@@ -156,7 +155,6 @@ if run_button:
                     html += '</table>'
                 html += '</div>'
 
-            # 신흥국 GDP 병합 표
             html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px;"><h3>신흥국</h3>'
             gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
             gdp_quarter = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(분기)'}
@@ -173,7 +171,6 @@ if run_button:
                 html += '</tr>'
             html += '</table>'
 
-            # 신흥국 기타 지표 병합 표
             g_keys = [k for k in value_map if k[0] in emerging and k[1] not in ['GDP(연간)', 'GDP(분기)']]
             all_periods = sorted({p for k in g_keys for p in value_map[k]}, reverse=True)[:6][::-1]
             html += '<table><tr><th>국가</th><th>지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
@@ -183,7 +180,7 @@ if run_button:
                 rowspan[k[0]] += 1
             for i, k in enumerate(sorted(g_keys, key=lambda x: (country_order.get(x[0], 99), sort_order.get(x[1], 99)))):
                 unit, base, _ = meta[k]
-                html += f'<tr{" style=\"border-bottom:2px solid black;\"" if i == len(g_keys)-1 else ""}>'
+                html += f'<tr{" style=\\"border-bottom:2px solid black;\\"" if i == len(g_keys)-1 else ""}>'
                 if k[0] != last_country:
                     html += f'<td rowspan="{rowspan[k[0]]}">{k[0]}</td>'
                     last_country = k[0]
@@ -198,6 +195,5 @@ if run_button:
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
             st.exception(e)
-
 else:
     st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
