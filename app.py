@@ -88,14 +88,14 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-                        if print_trigger:
+            if print_trigger:
                 components.html("""
                     <script>
                     window.print();
                     </script>
                 """, height=0)
 
-                        html = '''[중간완성.py의 html += 출력 블럭 전체 삽입됨]'''
+            html = '''[중간완성.py의 html += 출력 블럭 전체 삽입됨]'''
             components.html(html, height=1700, scrolling=True)
 
         except Exception as e:
