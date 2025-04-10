@@ -25,8 +25,7 @@ st.markdown("""
     border: 2px solid #333;
     font-weight:bold;
   ">📥 데이터 조회 및 표 출력</button>
-  <span style="font-size:10pt; color:#555;">made by curious@ibk.co.kr with ChatGPT</span>
-</div>
+  </div>
 """, unsafe_allow_html=True)
 run_button = True
 
