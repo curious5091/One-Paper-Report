@@ -18,7 +18,7 @@ all_countries = ["한국", "미국", "중국", "일본", "유로존"] + emerging
 
 # --- 커스텀 국가 선택 UI ---
 selected_countries = st.query_params.get("selected", ["전체 보기"])
-components.html("""
+components.html(r"""
 <div id=\"selector\">
   <div style=\"margin-bottom:10px;\"><b>국가 선택</b></div>
   <button class=\"toggle\" data-name=\"전체 보기\">전체 보기</button>
@@ -146,7 +146,6 @@ if run_button:
     meta = {}
     for _, row in grouped.iterrows():
         if "전체 보기" not in selected_countries and row['국가'] not in selected_countries and row['국가'] not in emerging:
-            continue
             continue
         key = (row['국가'], row['지표'])
         meta[key] = (row['단위'], row['기준점'], row['빈도'])
