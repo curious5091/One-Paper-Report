@@ -6,12 +6,10 @@ from collections import defaultdict
 from google.oauth2.service_account import Credentials
 import streamlit.components.v1 as components
 
-# 인증
 scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=scope)
 gc = gspread.authorize(credentials)
 
-# UI
 st.set_page_config(page_title="국가별 경제지표 조회", layout="wide")
 st.title("📊 국가별 경제지표 A4 표 출력 뷰어")
 
@@ -97,8 +95,20 @@ if st.button("📥 데이터 조회 및 표 출력"):
             tr:first-child th { border-top: 2px solid black; }
             tr:last-child td { border-bottom: 2px solid black; }
             tr:nth-child(2) th { border-bottom: 2px solid black; }
+
+            @media print {
+              .print-button { display: none !important; }
+            }
             </style></head><body>
+
+            <div class="print-button" style="text-align:right; margin: 10px 0;">
+              <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer;">🖨️ 인쇄 또는 PDF 저장</button>
+              <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
+                👉 이 버튼을 누르면 출력창이 열리며, PDF로 저장하거나 프린터로 바로 인쇄할 수 있습니다.
+              </p>
+            </div>
             '''
+
             for country in sorted(set(country_order) - emerging, key=lambda x: country_order[x]):
                 bg_color = color_map.get(country, '#ffffff')
                 html += f'<div style="background-color:{bg_color}; padding:10px; margin-bottom:25px;">'
@@ -167,17 +177,7 @@ if st.button("📥 데이터 조회 및 표 출력"):
                 for p in all_periods:
                     html += f'<td>{value_map[k].get(p, "")}</td>'
                 html += '</tr>'
-            html += '</table>'
-
-            html += '''
-            <div style="text-align:right; margin-top:20px;">
-              <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer;">🖨️ 인쇄 또는 PDF 저장</button>
-              <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
-                👉 이 버튼을 누르면 출력창이 열리며, PDF로 저장하거나 프린터로 바로 인쇄할 수 있습니다.
-              </p>
-            </div>
-            </body></html>
-            '''
+            html += '</table></div></body></html>'
 
             components.html(html, height=1500, scrolling=True)
 
@@ -187,4 +187,3 @@ if st.button("📥 데이터 조회 및 표 출력"):
 
 else:
     st.info("👆 상단 '📥 데이터 조회 및 표 출력' 버튼을 눌러주세요.")
-
