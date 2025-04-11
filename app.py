@@ -209,7 +209,7 @@ tr:first-child th {{ border-top: 2px solid black; border-bottom: 2px solid black
                 html += '</tr>'
             html += '</table></div>'
             html += '</div></body></html>'
-                                                components.html(html, height=1700, scrolling=True)
+                                                                        components.html(html, height=1700, scrolling=True)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
