@@ -29,13 +29,7 @@ st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 One Page Econom
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
 # 버튼 영역
-col1, col2, col3 = st.columns([1, 1, 1])
-with col1:
-    run_button = st.button("📥 데이터 조회 및 출력")
-with col2:
-    st.markdown(f'<a href="{apk_url}" download><button style="width:100%; padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
-with col3:
-    st.image(buffer.getvalue(), caption="QR코드를 스캔하여 앱을 설치하세요", width=200)
+run_button = st.button("📥 데이터 조회 및 출력")
 
 
 
@@ -73,9 +67,13 @@ if run_button:
             grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
 
             st.dataframe(grouped)
+            st.markdown(f'<a href="{apk_url}" download><button style="margin-top: 20px; padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
+            st.image(buffer.getvalue(), caption="📱 QR코드를 스캔하여 앱을 설치하세요", width=200)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
             st.exception(e)
 else:
     st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
+    st.markdown(f'<a href="{apk_url}" download><button style="padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
+    st.image(buffer.getvalue(), caption="📱 QR코드를 스캔하여 앱을 설치하세요", width=200)
