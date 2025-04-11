@@ -81,7 +81,7 @@ with col2:
 with col3:
     st.markdown('<button onclick="document.getElementById(\'qrModal\').style.display=\'block\'" style="width:100%; padding:0.5rem 1.2rem; font-size:14px;">📷 QR코드 보기</button>', unsafe_allow_html=True)
 
-st.markdown(f"""
+st.markdown(
 <div id="qrModal">
   <div id="qrContent">
     <div id="closeBtn" onclick="document.getElementById('qrModal').style.display='none'">[닫기]</div>
