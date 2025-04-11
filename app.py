@@ -83,7 +83,7 @@ with col3:
 st.markdown(f"""
 <div id="qrModal">
   <div id="qrContent">
-    <div id="closeBtn" onclick="document.getElementById('qrModal').style.display='none'">❌</div>
+    <div id="closeBtn" onclick="document.getElementById('qrModal').style.display='none'">[닫기]</div>
     <img src="data:image/png;base64,{qr_b64}" alt="QR 코드" />
     <p style="margin-top: 10px; font-size: 12px;">휴대폰 카메라로 스캔하여 설치하세요</p>
   </div>
