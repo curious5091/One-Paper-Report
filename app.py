@@ -13,8 +13,8 @@ scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=scope)
 gc = gspread.authorize(credentials)
 
-st.set_page_config(page_title="IBK ERI One Page Economy Report", layout="wide")
-st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 IBK ERI One Page Economy Report</h1>", unsafe_allow_html=True)
+st.set_page_config(page_title="One Page Economy Report - IBK ERI", layout="wide")
+st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 One Page Economy Report - IBK ERI</h1>", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
 run_button = st.button("📥 데이터 조회 및 출력")
@@ -100,7 +100,7 @@ if run_button:
             @media print {{ .print-button {{ display: none !important; }} }}
             </style></head><body>
             <div style="text-align:center; margin-bottom:4px;">
-              <h2 style="margin: 0;">📊 IBK ERI One Page Economy Report</h2>
+              <h2 style="margin: 0;">📊 One Page Economy Report - IBK ERI</h2>
               <div style="font-size:9pt;">기준일시: {now} 기준</div>
             </div>
             <div class="print-button" style="text-align:right; margin: 10px 0;">
