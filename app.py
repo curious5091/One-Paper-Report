@@ -19,7 +19,9 @@ run_button = st.button("📥 데이터 조회 및 출력")
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
         try:
-            sheet = gc.open_by_key("1OSzr7Kb0CrfFSXaD60BLoPknJDo28kC1B_L6CgxxMOw")
+            from datetime import datetime
+            now = datetime.now().strftime("%Y-%m-%d %H:%M")
+sheet = gc.open_by_key("1OSzr7Kb0CrfFSXaD60BLoPknJDo28kC1B_L6CgxxMOw")
             worksheet = sheet.worksheet("Database")
             df = get_as_dataframe(worksheet).dropna(how='all')
             df.columns = df.columns.str.strip()
@@ -82,8 +84,8 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            from datetime import datetime
-now = datetime.now().strftime("%Y-%m-%d %H:%M")
+            
+
 
 html = f'''
             <html><head><style>
