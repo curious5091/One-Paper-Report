@@ -35,26 +35,11 @@ with col1:
 with col2:
     st.markdown(f'<a href="{apk_url}" download><button style="width:100%; padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
 with col3:
-    st.markdown('<button onclick="document.getElementById(\'qrModal\').style.display=\'block\'" style="width:100%; padding:0.5rem 1.2rem; font-size:14px;">📷 QR코드 보기</button>', unsafe_allow_html=True)
+    qr_visible = st.button("📷 QR코드 보기")
 
 # QR 모달 HTML
-st.markdown(f"""
-<div id="qrModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.6);">
-  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border-radius:12px; text-align:center;">
-    <div onclick="document.getElementById('qrModal').style.display='none'" style="position:absolute; top:10px; right:14px; font-size:18px; cursor:pointer;">❌</div>
-    <img src="data:image/png;base64,{qr_b64}" style="width:200px; height:auto;" />
-    <p style="margin-top: 10px; font-size: 12px;">QR코드를 스캔하여 앱을 설치하세요</p>
-  </div>
-</div>
-<script>
-window.addEventListener("click", function(event) {{
-  var modal = document.getElementById("qrModal");
-  if (event.target === modal) {{
-    modal.style.display = "none";
-  }}
-}});
-</script>
-""", unsafe_allow_html=True)
+if qr_visible:
+    st.image(buffer.getvalue(), caption="QR코드를 스캔하여 앱을 설치하세요", width=200)
 
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
