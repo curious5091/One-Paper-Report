@@ -71,7 +71,6 @@ st.markdown("""
     color: #333;
 }
 </style>
-""", unsafe_allow_html=True)
 
 # 버튼 배치 및 QR 모달 삽입
 col1, col2, col3 = st.columns([1, 1, 1])
@@ -97,8 +96,6 @@ document.addEventListener("click", function(event) {
   if (event.target == modal) modal.style.display = "none";
 });
 </script>
-""", unsafe_allow_html=True)
-""", unsafe_allow_html=True)
 
 # 'run_button'은 상단 col1 내부에서 정의됨
 
