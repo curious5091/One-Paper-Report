@@ -19,7 +19,7 @@ st.markdown("""
         <img src='app_icon.png' width='42'/>
         <h1 style='font-size:24pt; margin:0;'>One Page Economy Report - IBK ERI</h1>
     </div>
-""", unsafe_allow_html=True), unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
 run_button = st.button("📥 데이터 조회 및 출력")
