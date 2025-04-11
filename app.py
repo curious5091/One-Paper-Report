@@ -35,11 +35,9 @@ with col1:
 with col2:
     st.markdown(f'<a href="{apk_url}" download><button style="width:100%; padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
 with col3:
-    qr_visible = st.button("📷 QR코드 보기")
-
-# QR 모달 HTML
-if qr_visible:
     st.image(buffer.getvalue(), caption="QR코드를 스캔하여 앱을 설치하세요", width=200)
+
+
 
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
