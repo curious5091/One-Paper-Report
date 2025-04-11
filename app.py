@@ -68,7 +68,7 @@ if run_button:
 
             st.dataframe(grouped)
             st.markdown(f'<a href="{apk_url}" download><button style="margin-top: 20px; padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
-            st.image(buffer.getvalue(), caption="📱 QR코드를 스캔하여 앱을 설치하세요", width=200)
+            st.image(buffer.getvalue(), caption="📱 QR코드를 스캔하여 앱을 설치하세요", width=280)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
@@ -76,4 +76,4 @@ if run_button:
 else:
     st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
     st.markdown(f'<a href="{apk_url}" download><button style="padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
-    st.image(buffer.getvalue(), caption="📱 QR코드를 스캔하여 앱을 설치하세요", width=200)
+    st.image(buffer.getvalue(), caption="📱 QR코드를 스캔하여 앱을 설치하세요", width=280)
