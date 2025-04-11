@@ -7,15 +7,6 @@ from google.oauth2.service_account import Credentials
 import streamlit.components.v1 as components
 from datetime import datetime
 from pytz import timezone
-import base64
-import qrcode
-from io import BytesIO
-
-# APK 다운로드 링크 및 QR 코드 생성
-apk_url = "https://github.com/curious5091/One-Paper-Report/releases/download/ver.1.0/IBK_ERI_OPER.apk"
-buffer = BytesIO()
-qrcode.make(apk_url).save(buffer, format="PNG")
-qr_b64 = base64.b64encode(buffer.getvalue()).decode()
 
 # 인증 및 설정
 scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
@@ -23,12 +14,9 @@ credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=sc
 gc = gspread.authorize(credentials)
 
 st.set_page_config(page_title="One Page Economy Report - IBK ERI", layout="wide")
-
-# 상단 제목
 st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 One Page Economy Report - IBK ERI</h1>", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
-# 버튼 영역
 run_button = st.button("📥 데이터 조회 및 출력")
 
 if run_button:
@@ -98,7 +86,8 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            html = f"""
+            # HTML 출력 시작
+            html = f'''
             <html><head><style>
             @page {{ size: A4 portrait; margin: 5mm; }}
             body {{ font-family: 'Malgun Gothic'; font-size: 10pt; color: #000; -webkit-print-color-adjust: exact; }}
@@ -110,17 +99,18 @@ if run_button:
             .page-break {{ page-break-before: always; }}
             @media print {{ .print-button {{ display: none !important; }} }}
             </style></head><body>
-            <div style=\"text-align:center; margin-bottom:4px;\">
-              <h2 style=\"margin: 0;\">📊 One Page Economy Report - IBK ERI</h2>
-              <div style=\"font-size:9pt;\">기준일시: {now} 기준</div>
+            <div style="text-align:center; margin-bottom:4px;">
+              <h2 style="margin: 0;">📊 One Page Economy Report - IBK ERI</h2>
+              <div style="font-size:9pt;">기준일시: {now} 기준</div>
             </div>
-            <div class=\"print-button\" style=\"text-align:right; margin: 10px 0;\">
-              <button onclick=\"window.print()\" style=\"padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;\">🖨️ 인쇄 또는 PDF 저장</button>
-              <p style=\"font-size:8pt; color:#555; text-align:right; margin-top:6px;\">
+            <div class="print-button" style="text-align:right; margin: 10px 0;">
+              <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;">🖨️ 인쇄 또는 PDF 저장</button>
+              <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
                 👉 이 버튼을 누르면 출력창이 열리며, PDF로 저장하거나 프린터로 바로 인쇄할 수 있습니다.
               </p>
             </div>
-            """
+            '''
+
             # 주요국 출력
             for country in ['한국', '미국', '중국']:
                 bg_color = color_map.get(country, '#ffffff')
@@ -156,14 +146,110 @@ if run_button:
                     html += '</table>'
                 html += '</div>'
 
-            html += '</body></html>'
-            components.html(html, height=1800, scrolling=True)
+            # 일본, 유로존 출력
+            html += '<div class="page-break">'
+            for country in ['일본', '유로존']:
+                bg_color = color_map.get(country, '#ffffff')
+                html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px; page-break-inside: avoid;">'
+                html += f'<h3 style="color:#000;">{country}</h3>'
 
+                key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
+                if key_y in value_map or key_q in value_map:
+                    periods_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1]
+                    periods_q = sorted(value_map[key_q].keys(), reverse=True)[:8][::-1]
+                    label_y = format_label('GDP(연간)', *meta[key_y][:2])
+                    label_q = format_label('GDP(분기)', *meta[key_q][:2])
+                    html += '<table><tr>'
+                    html += f'<th colspan="{len(periods_y)}">{label_y}</th>'
+                    html += f'<th colspan="{len(periods_q)}">{label_q}</th></tr>'
+                    html += '<tr>' + ''.join(f'<th>{p}</th>' for p in periods_y + periods_q) + '</tr>'
+                    html += '<tr style="border-bottom:2px solid black;">'
+                    html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in periods_y)
+                    html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
+                    html += '</tr></table>'
+
+                keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 6]
+                if keys6:
+                    all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
+                    html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
+                    for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
+                        unit, base, _ = meta[k]
+                        row_style = ' style="border-bottom:2px solid black;"' if i == len(keys6)-1 else ''
+                        html += f'<tr{row_style}><td class="label">{format_label(k[1], unit, base)}</td>'
+                        for p in all_periods:
+                            html += f'<td>{value_map[k].get(p, "")}</td>'
+                        html += '</tr>'
+                    html += '</table>'
+                html += '</div>'
+
+            # 신흥국 GDP 및 기타 지표 출력
+            html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px; page-break-inside: avoid;"><h3>신흥국</h3>'
+            gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
+            gdp_quarter = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(분기)'}
+            annual_periods = sorted({p for v in gdp_annual.values() for p in v}, reverse=True)[:4][::-1]
+            quarter_periods = sorted({p for v in gdp_quarter.values() for p in v}, reverse=True)[:8][::-1]
+            html += '<table>'
+            html += f'<tr><th>국가</th>'
+            html += f'<th colspan="{len(annual_periods)}">{format_label("GDP(연간)", "%", "전동비")}</th>'
+            html += f'<th colspan="{len(quarter_periods)}">{format_label("GDP(분기)", "%", "전동비")}</th></tr>'
+            html += '<tr><th>-</th>'
+            html += ''.join(f'<th>{p}</th>' for p in annual_periods + quarter_periods)
+            html += '</tr>'
+            for i, country in enumerate(sorted(emerging, key=lambda x: country_order.get(x, 99))):
+                html += f'<tr{" style=\"border-bottom:2px solid black;\"" if i == len(emerging)-1 else ""}>'
+                html += f'<td>{country}</td>'
+                html += ''.join(f'<td>{gdp_annual.get((country, "GDP(연간)"), {}).get(p, "")}</td>' for p in annual_periods)
+                html += ''.join(f'<td>{gdp_quarter.get((country, "GDP(분기)"), {}).get(p, "")}</td>' for p in quarter_periods)
+                html += '</tr>'
+            html += '</table>'
+
+            keys_etc = [k for k in value_map if k[0] in emerging and k[1] not in ['GDP(연간)', 'GDP(분기)']]
+            all_periods = sorted({p for k in keys_etc for p in value_map[k]}, reverse=True)[:6][::-1]
+            html += '<table><tr><th>국가</th><th>지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
+            last_country = None
+            rowspan = defaultdict(int)
+            for k in keys_etc:
+                rowspan[k[0]] += 1
+            for i, k in enumerate(sorted(keys_etc, key=lambda x: (country_order.get(x[0], 99), sort_order.get(x[1], 99)))):
+                unit, base, _ = meta[k]
+                html += f'<tr{" style=\"border-bottom:2px solid black;\"" if i == len(keys_etc)-1 else ""}>'
+                if k[0] != last_country:
+                    html += f'<td rowspan="{rowspan[k[0]]}">{k[0]}</td>'
+                    last_country = k[0]
+                html += f'<td class="label">{format_label(k[1], unit, base)}</td>'
+                for p in all_periods:
+                    html += f'<td>{value_map[k].get(p, "")}</td>'
+                html += '</tr>'
+            html += '</table></div>'
+
+            html += '</body></html>'
+            components.html(html, height=1700, scrolling=True)
+
+        # 화면 하단 설치용 앱 버튼 및 QR코드 삽입
+st.markdown("---")
+st.markdown("### 📱 IBK ERI OPER 앱 설치 안내")
+st.markdown("아래 버튼을 클릭하거나 QR 코드를 스캔해 설치할 수 있습니다.")
+
+github_apk_url = "https://github.com/curious5091/One-Paper-Report/releases/download/ver.1.0/IBK_ERI_OPER.apk"
+qr_img_url = "https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=" + github_apk_url
+
+col1, col2 = st.columns([1, 1])
+with col1:
+    st.markdown(f"""
+        <a href="{github_apk_url}" target="_blank">
+            <button style="padding: 10px 18px; font-size: 11pt; font-weight:bold; border: 2px solid #333; background-color:#f9f9f9; color:#000; cursor:pointer;">
+                📥 Android 앱 다운로드
+            </button>
+        </a>
+    """, unsafe_allow_html=True)
+with col2:
+    st.image(qr_img_url, caption="QR코드로 설치하기", width=180)
+
+
+
+        
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
             st.exception(e)
-
 else:
     st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
-    st.markdown(f'<a href="{apk_url}" download><button style="padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
-    st.image(buffer.getvalue(), caption="📱 QR코드를 스캔하여 앱을 설치하세요", width=280)
