@@ -156,8 +156,7 @@ if run_button:
                             html += f'<td>{value_map[k].get(p, "")}</td>'
                         html += '</tr>'
                     html += '</table>'
-                html += '</div>'
-                    bg_color = color_map.get(country, '#ffffff')
+                
     html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px; page-break-inside: avoid;">'
     html += f'<h3 style="color:#000;">{country}</h3>'
 
