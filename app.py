@@ -65,6 +65,7 @@ if run_button:
             grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
 
             # === HTML 템플릿 및 반복 출력 블록 시작 ===
+# 전체 HTML 표 생성 및 국가별 반복 출력 포함 (정상 들여쓰기 포함)
             omit_base = {'기준금리'}
             sort_order = {
                 '기준금리': 0, '실업률': 1, 'PCE': 2, 'CPI': 3, 'PPI': 4, '무역수지': 5, '수출': 6, '수입': 7,
@@ -124,7 +125,39 @@ if run_button:
             '''
 
             for country in ['한국', '미국', '중국', '일본', '유로존']:
-    bg_color = color_map.get(country, '#ffffff')
+                bg_color = color_map.get(country, '#ffffff')
+                html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px; page-break-inside: avoid;">'
+                html += f'<h3 style="color:#000;">{country}</h3>'
+
+                key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
+                if key_y in value_map or key_q in value_map:
+                    periods_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1]
+                    periods_q = sorted(value_map[key_q].keys(), reverse=True)[:8][::-1]
+                    label_y = format_label('GDP(연간)', *meta[key_y][:2])
+                    label_q = format_label('GDP(분기)', *meta[key_q][:2])
+                    html += '<table><tr>'
+                    html += f'<th colspan="{len(periods_y)}">{label_y}</th>'
+                    html += f'<th colspan="{len(periods_q)}">{label_q}</th></tr>'
+                    html += '<tr>' + ''.join(f'<th>{p}</th>' for p in periods_y + periods_q) + '</tr>'
+                    html += '<tr style="border-bottom:2px solid black;">'
+                    html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in periods_y)
+                    html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
+                    html += '</tr></table>'
+
+                keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 6]
+                if keys6:
+                    all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
+                    html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
+                    for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
+                        unit, base, _ = meta[k]
+                        row_style = ' style="border-bottom:2px solid black;"' if i == len(keys6)-1 else ''
+                        html += f'<tr{row_style}><td class="label">{format_label(k[1], unit, base)}</td>'
+                        for p in all_periods:
+                            html += f'<td>{value_map[k].get(p, "")}</td>'
+                        html += '</tr>'
+                    html += '</table>'
+                html += '</div>'
+                    bg_color = color_map.get(country, '#ffffff')
     html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px; page-break-inside: avoid;">'
     html += f'<h3 style="color:#000;">{country}</h3>'
 
