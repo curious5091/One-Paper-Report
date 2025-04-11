@@ -25,31 +25,31 @@ qrcode.make(apk_url).save(buffer, format="PNG")
 qr_b64 = base64.b64encode(buffer.getvalue()).decode()
 
 # 사용자 인터페이스 버튼 배치 및 QR 팝업
-st.markdown(f"""
+st.markdown("""
 <style>
-.button-container {{
+.button-container {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-}}
+}
 .button-container a button,
-.button-container button {{
+.button-container button {
     padding: 0.5rem 1.2rem;
     font-size: 14px;
     font-weight: bold;
     border: 2px solid #333;
     background-color: white;
     cursor: pointer;
-}}
-#qrModal {{
+}
+#qrModal {
     display: none;
     position: fixed;
     z-index: 9999;
     left: 0; top: 0;
     width: 100%; height: 100%;
     background-color: rgba(0,0,0,0.6);
-}}
-#qrContent {{
+}
+#qrContent {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
@@ -58,20 +58,22 @@ st.markdown(f"""
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     text-align: center;
-}}
-#qrContent img {{
+}
+#qrContent img {
     width: 200px;
     height: auto;
-}}
-#closeBtn {{
+}
+#closeBtn {
     position: absolute;
     top: 10px; right: 14px;
     font-size: 18px;
     cursor: pointer;
     color: #333;
-}}
+}
 </style>
+""", unsafe_allow_html=True)
 
+# 버튼 배치 및 QR 모달 삽입
 col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     run_button = st.button("📥 데이터 조회 및 출력")
@@ -90,10 +92,10 @@ st.markdown(f"""
 </div>
 
 <script>
-document.addEventListener("click", function(event) {{
+document.addEventListener("click", function(event) {
   const modal = document.getElementById('qrModal');
   if (event.target == modal) modal.style.display = "none";
-}});
+});
 </script>
 """, unsafe_allow_html=True)
 """, unsafe_allow_html=True)
