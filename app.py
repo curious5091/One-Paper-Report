@@ -199,19 +199,7 @@ if run_button:
             html += '</body></html>'
             components.html(html, height=1800, scrolling=True)
 
-            value_map = defaultdict(dict)
-            for _, row in grouped.iterrows():
-                key = (row['국가'], row['지표'])
-                value_map[key][row['기준시점_text']] = row['값']
-
-            html = "<h3>데이터 시각화</h3>"
-            html += "<table style='width:100%; border-collapse:collapse;'>"
-            html += "<tr><th style='border:1px solid black;'>국가</th><th style='border:1px solid black;'>지표</th><th style='border:1px solid black;'>기준시점</th><th style='border:1px solid black;'>값</th></tr>"
-            for key, val_dict in value_map.items():
-                for 기준, 값 in val_dict.items():
-                    html += f"<tr><td style='border:1px solid black;'>{key[0]}</td><td style='border:1px solid black;'>{key[1]}</td><td style='border:1px solid black;'>{기준}</td><td style='border:1px solid black;'>{값}</td></tr>"
-            html += "</table>"
-            components.html(html, height=600, scrolling=True)
+            
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
