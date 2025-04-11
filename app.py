@@ -31,8 +31,6 @@ st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made b
 # 버튼 영역
 run_button = st.button("📥 데이터 조회 및 출력")
 
-
-
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
         try:
@@ -66,7 +64,7 @@ if run_button:
 
             grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
 
-            # === 베이스코드의 전체 HTML 출력 ===
+            # === HTML 템플릿 및 반복 출력 블록 시작 ===
             omit_base = {'기준금리'}
             sort_order = {
                 '기준금리': 0, '실업률': 1, 'PCE': 2, 'CPI': 3, 'PPI': 4, '무역수지': 5, '수출': 6, '수입': 7,
@@ -101,8 +99,8 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            html = f'''
-            <html><head><style>
+            # HTML 출력 시작
+            html = f'''<html><head><style>
             @page {{ size: A4 portrait; margin: 5mm; }}
             body {{ font-family: 'Malgun Gothic'; font-size: 10pt; color: #000; -webkit-print-color-adjust: exact; }}
             table {{ border-collapse: collapse; width: 100%; margin-bottom: 8px; page-break-inside: avoid; }}
@@ -124,7 +122,8 @@ if run_button:
               </p>
             </div>
             '''
-            for country in ['한국', '미국', '중국']:
+
+            for country in ['한국', '미국', '중국', '일본', '유로존']:
     bg_color = color_map.get(country, '#ffffff')
     html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px; page-break-inside: avoid;">'
     html += f'<h3 style="color:#000;">{country}</h3>'
@@ -158,48 +157,12 @@ if run_button:
         html += '</table>'
     html += '</div>'
 
-# 일본, 유로존 출력
 html += '<div class="page-break">'
-for country in ['일본', '유로존']:
-    bg_color = color_map.get(country, '#ffffff')
-    html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:15px; page-break-inside: avoid;">'
-    html += f'<h3 style="color:#000;">{country}</h3>'
-
-    key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
-    if key_y in value_map or key_q in value_map:
-        periods_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1]
-        periods_q = sorted(value_map[key_q].keys(), reverse=True)[:8][::-1]
-        label_y = format_label('GDP(연간)', *meta[key_y][:2])
-        label_q = format_label('GDP(분기)', *meta[key_q][:2])
-        html += '<table><tr>'
-        html += f'<th colspan="{len(periods_y)}">{label_y}</th>'
-        html += f'<th colspan="{len(periods_q)}">{label_q}</th></tr>'
-        html += '<tr>' + ''.join(f'<th>{p}</th>' for p in periods_y + periods_q) + '</tr>'
-        html += '<tr style="border-bottom:2px solid black;">'
-        html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in periods_y)
-        html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
-        html += '</tr></table>'
-
-    keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 6]
-    if keys6:
-        all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
-        html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
-        for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
-            unit, base, _ = meta[k]
-            row_style = ' style="border-bottom:2px solid black;"' if i == len(keys6)-1 else ''
-            html += f'<tr{row_style}><td class="label">{format_label(k[1], unit, base)}</td>'
-            for p in all_periods:
-                html += f'<td>{value_map[k].get(p, "")}</td>'
-            html += '</tr>'
-        html += '</table>'
-    html += '</div>'
-
-# 신흥국 GDP 및 기타 지표 출력
-html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px; page-break-inside: avoid;"><h3>신흥국</h3>'
 gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
 gdp_quarter = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(분기)'}
 annual_periods = sorted({p for v in gdp_annual.values() for p in v}, reverse=True)[:4][::-1]
 quarter_periods = sorted({p for v in gdp_quarter.values() for p in v}, reverse=True)[:8][::-1]
+html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px; page-break-inside: avoid;"><h3>신흥국</h3>'
 html += '<table>'
 html += f'<tr><th>국가</th>'
 html += f'<th colspan="{len(annual_periods)}">{format_label("GDP(연간)", "%", "전동비")}</th>'
@@ -233,11 +196,8 @@ for i, k in enumerate(sorted(keys_etc, key=lambda x: (country_order.get(x[0], 99
         html += f'<td>{value_map[k].get(p, "")}</td>'
     html += '</tr>'
 html += '</table></div>'
-
-html += '</body></html>'
-components.html(html, height=1700, scrolling=True)
-            st.markdown(f'<a href="{apk_url}" download><button style="margin-top: 20px; padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
-            st.image(buffer.getvalue(), caption="📱 QR코드를 스캔하여 앱을 설치하세요", width=280)
+html += '</div></body></html>'
+components.html(html, height=1800, scrolling=True)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
