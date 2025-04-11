@@ -71,7 +71,7 @@ st.markdown("""
     color: #333;
 }
 </style>
-
+""", unsafe_allow_html=True)
 # 버튼 배치 및 QR 모달 삽입
 col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
