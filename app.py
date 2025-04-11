@@ -117,7 +117,36 @@ if run_button:
             @media print {
               .print-button { display: none !important; }
             }
-            </style></head><body>
+            
+@page {{ size: A4 portrait; margin: 5mm; }}
+body {{
+  font-family: 'Malgun Gothic';
+  font-size: 10pt;
+  color: #000;
+  -webkit-print-color-adjust: exact;
+}}
+table {{
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 8px;
+  page-break-inside: avoid;
+}}
+th, td {{
+  border: 1px solid black;
+  padding: 2px;
+  font-size: 8pt;
+  line-height: 1.2;
+  text-align: center;
+  color: #000;
+}}
+th:first-child, td:first-child {{ border-left: none; }}
+th:last-child, td:last-child {{ border-right: none; }}
+tr:first-child th {{ border-top: 2px solid black; border-bottom: 2px solid black; }}
+.page-break {{ page-break-before: always; }}
+@media print {{
+  .print-button {{ display: none !important; }}
+}}
+</style></head><body>
 <div style="text-align:center; margin-bottom:10px;">
   <h2 style="margin: 0;">📊 IBK ERI One Page Economy Report</h2>
   <div style="font-size:9pt;">기준일시: {now} 기준</div>
