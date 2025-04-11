@@ -81,7 +81,7 @@ with col2:
 with col3:
     st.markdown('<button onclick="document.getElementById(\'qrModal\').style.display=\'block\'" style="width:100%; padding:0.5rem 1.2rem; font-size:14px;">📷 QR코드 보기</button>', unsafe_allow_html=True)
 
-st.markdown(
+st.markdown(f"""
 <div id="qrModal">
   <div id="qrContent">
     <div id="closeBtn" onclick="document.getElementById('qrModal').style.display='none'">[닫기]</div>
@@ -96,7 +96,7 @@ document.addEventListener("click", function(event) {
   if (event.target == modal) modal.style.display = "none";
 });
 </script>
-
+""", unsafe_allow_html=True)
 # 'run_button'은 상단 col1 내부에서 정의됨
 
 st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 One Page Economy Report - IBK ERI</h1>", unsafe_allow_html=True)
