@@ -72,16 +72,15 @@ st.markdown(f"""
 }}
 </style>
 
-<div class="button-container">
-    <form action="" method="post">
-        <button name="run" type="submit">📥 데이터 조회 및 출력</button>
-    </form>
-    <a href="{apk_url}" download>
-        <button>📱 Android 앱 설치</button>
-    </a>
-    <button onclick="document.getElementById('qrModal').style.display='block'">📷 QR코드 보기</button>
-</div>
+col1, col2, col3 = st.columns([1, 1, 1])
+with col1:
+    run_button = st.button("📥 데이터 조회 및 출력")
+with col2:
+    st.markdown(f'<a href="{apk_url}" download><button style="width:100%; padding:0.5rem 1.2rem; font-size:14px;">📱 Android 앱 설치</button></a>', unsafe_allow_html=True)
+with col3:
+    st.markdown('<button onclick="document.getElementById(\'qrModal\').style.display=\'block\'" style="width:100%; padding:0.5rem 1.2rem; font-size:14px;">📷 QR코드 보기</button>', unsafe_allow_html=True)
 
+st.markdown(f"""
 <div id="qrModal">
   <div id="qrContent">
     <div id="closeBtn" onclick="document.getElementById('qrModal').style.display='none'">❌</div>
@@ -97,8 +96,9 @@ document.addEventListener("click", function(event) {{
 }});
 </script>
 """, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-run_button = st.session_state.get("run")
+# 'run_button'은 상단 col1 내부에서 정의됨
 
 st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 One Page Economy Report - IBK ERI</h1>", unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
