@@ -86,8 +86,7 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            # HTML 출력 생성
-                       # HTML 출력 시작
+            # HTML 출력 시작
             html = f'''
             <html><head><style>
             @page {{ size: A4 portrait; margin: 5mm; }}
@@ -225,27 +224,6 @@ if run_button:
 
             html += '</body></html>'
             components.html(html, height=1700, scrolling=True)
-
-
-            # ✅ 앱 설치 버튼 및 QR코드 하단 추가
-            st.markdown("---")
-            st.markdown("### 📱 IBK ERI OPER 앱 설치 안내")
-            st.markdown("아래 버튼을 클릭하거나 QR 코드를 스캔해 설치할 수 있습니다.")
-
-            github_apk_url = "https://github.com/curious5091/One-Paper-Report/releases/download/ver.1.0/IBK_ERI_OPER.apk"
-            qr_img_url = "https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=" + github_apk_url
-
-            col1, col2 = st.columns([1, 1])
-            with col1:
-                st.markdown(f"""
-                    <a href="{github_apk_url}" target="_blank">
-                        <button style="padding: 10px 18px; font-size: 11pt; font-weight:bold; border: 2px solid #333; background-color:#f9f9f9; color:#000; cursor:pointer;">
-                            📥 Android 앱 다운로드
-                        </button>
-                    </a>
-                """, unsafe_allow_html=True)
-            with col2:
-                st.image(qr_img_url, caption="QR코드로 설치하기", width=180)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
