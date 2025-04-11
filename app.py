@@ -6,6 +6,7 @@ from collections import defaultdict
 from google.oauth2.service_account import Credentials
 import streamlit.components.v1 as components
 from datetime import datetime
+from pytz import timezone
 
 # 인증 및 설정
 scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
@@ -21,7 +22,7 @@ run_button = st.button("📥 데이터 조회 및 출력")
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
         try:
-            now = datetime.now().strftime("%Y-%m-%d %H:%M")
+            now = datetime.now(timezone('Asia/Seoul')).strftime("%Y-%m-%d %H:%M")
             sheet = gc.open_by_key("1OSzr7Kb0CrfFSXaD60BLoPknJDo28kC1B_L6CgxxMOw")
             worksheet = sheet.worksheet("Database")
             df = get_as_dataframe(worksheet).dropna(how='all')
@@ -98,7 +99,7 @@ if run_button:
             .page-break {{ page-break-before: always; }}
             @media print {{ .print-button {{ display: none !important; }} }}
             </style></head><body>
-            <div style="text-align:center; margin-bottom:10px;">
+            <div style="text-align:center; margin-bottom:4px;">
               <h2 style="margin: 0;">📊 IBK ERI One Page Economy Report</h2>
               <div style="font-size:9pt;">기준일시: {now} 기준</div>
             </div>
