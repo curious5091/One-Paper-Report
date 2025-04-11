@@ -1,4 +1,4 @@
-import streamlit as st
+ㅍimport streamlit as st
 import gspread
 from gspread_dataframe import get_as_dataframe
 import pandas as pd
@@ -182,7 +182,45 @@ if run_button:
                     html += '</table>'
                 html += '</div>'
 
-            # 신흥국 출력 생략 가능 - 필요 시 요청
+            # 신흥국 GDP 및 기타 지표 출력
+            html += f'<div style="background-color:{color_map["베트남"]}; padding:6px; margin-bottom:15px; page-break-inside: avoid;"><h3>신흥국</h3>'
+            gdp_annual = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(연간)'}
+            gdp_quarter = {k: v for k, v in value_map.items() if k[0] in emerging and k[1] == 'GDP(분기)'}
+            annual_periods = sorted({p for v in gdp_annual.values() for p in v}, reverse=True)[:4][::-1]
+            quarter_periods = sorted({p for v in gdp_quarter.values() for p in v}, reverse=True)[:8][::-1]
+            html += '<table>'
+            html += f'<tr><th>국가</th>'
+            html += f'<th colspan="{len(annual_periods)}">{format_label("GDP(연간)", "%", "전동비")}</th>'
+            html += f'<th colspan="{len(quarter_periods)}">{format_label("GDP(분기)", "%", "전동비")}</th></tr>'
+            html += '<tr><th>-</th>'
+            html += ''.join(f'<th>{p}</th>' for p in annual_periods + quarter_periods)
+            html += '</tr>'
+            for i, country in enumerate(sorted(emerging, key=lambda x: country_order.get(x, 99))):
+                html += f'<tr{" style=\"border-bottom:2px solid black;\"" if i == len(emerging)-1 else ""}>'
+                html += f'<td>{country}</td>'
+                html += ''.join(f'<td>{gdp_annual.get((country, "GDP(연간)"), {}).get(p, "")}</td>' for p in annual_periods)
+                html += ''.join(f'<td>{gdp_quarter.get((country, "GDP(분기)"), {}).get(p, "")}</td>' for p in quarter_periods)
+                html += '</tr>'
+            html += '</table>'
+
+            keys_etc = [k for k in value_map if k[0] in emerging and k[1] not in ['GDP(연간)', 'GDP(분기)']]
+            all_periods = sorted({p for k in keys_etc for p in value_map[k]}, reverse=True)[:6][::-1]
+            html += '<table><tr><th>국가</th><th>지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
+            last_country = None
+            rowspan = defaultdict(int)
+            for k in keys_etc:
+                rowspan[k[0]] += 1
+            for i, k in enumerate(sorted(keys_etc, key=lambda x: (country_order.get(x[0], 99), sort_order.get(x[1], 99)))):
+                unit, base, _ = meta[k]
+                html += f'<tr{" style=\"border-bottom:2px solid black;\"" if i == len(keys_etc)-1 else ""}>'
+                if k[0] != last_country:
+                    html += f'<td rowspan="{rowspan[k[0]]}">{k[0]}</td>'
+                    last_country = k[0]
+                html += f'<td class="label">{format_label(k[1], unit, base)}</td>'
+                for p in all_periods:
+                    html += f'<td>{value_map[k].get(p, "")}</td>'
+                html += '</tr>'
+            html += '</table></div>'
 
             html += '</body></html>'
             components.html(html, height=1700, scrolling=True)
