@@ -19,8 +19,6 @@ run_button = st.button("📥 데이터 조회 및 출력")
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
         try:
-            from datetime import datetime
-            now = datetime.now().strftime("%Y-%m-%d %H:%M")
             sheet = gc.open_by_key("1OSzr7Kb0CrfFSXaD60BLoPknJDo28kC1B_L6CgxxMOw")
             worksheet = sheet.worksheet("Database")
             df = get_as_dataframe(worksheet).dropna(how='all')
@@ -84,44 +82,37 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            
-
-
-            html = f'''
+            html = '''
             <html><head><style>
-@page {{ size: A4 portrait; margin: 5mm; }}
-body {{
-  font-family: 'Malgun Gothic';
-  font-size: 10pt;
-  color: #000;
-  -webkit-print-color-adjust: exact;
-}}
-table {{
-  border-collapse: collapse;
-  width: 100%;
-  margin-bottom: 8px;
-  page-break-inside: avoid;
-}}
-th, td {{
-  border: 1px solid black;
-  padding: 2px;
-  font-size: 8pt;
-  line-height: 1.2;
-  text-align: center;
-  color: #000;
-}}
-th:first-child, td:first-child {{ border-left: none; }}
-th:last-child, td:last-child {{ border-right: none; }}
-tr:first-child th {{ border-top: 2px solid black; border-bottom: 2px solid black; }}
-.page-break {{ page-break-before: always; }}
-@media print {{
-  .print-button {{ display: none !important; }}
-}}
-</style></head><body>
-<div style="text-align:center; margin-bottom:10px;">
-  <h2 style="margin: 0;">📊 IBK ERI One Page Economy Report</h2>
-  <div style="font-size:9pt;">기준일시: {now} 기준</div>
-</div>
+            @page { size: A4 portrait; margin: 5mm; }
+            body {
+              font-family: 'Malgun Gothic';
+              font-size: 10pt;
+              color: #000;
+              -webkit-print-color-adjust: exact;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              margin-bottom: 8px;
+              page-break-inside: avoid;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 2px;
+              font-size: 8pt;
+              line-height: 1.2;
+              text-align: center;
+              color: #000;
+            }
+            th:first-child, td:first-child { border-left: none; }
+            th:last-child, td:last-child { border-right: none; }
+            tr:first-child th { border-top: 2px solid black; border-bottom: 2px solid black; }
+            .page-break { page-break-before: always; }
+            @media print {
+              .print-button { display: none !important; }
+            }
+            </style></head><body>
             <div class="print-button" style="text-align:right; margin: 10px 0;">
               <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;">🖨️ 인쇄 또는 PDF 저장</button>
               <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
@@ -209,7 +200,7 @@ tr:first-child th {{ border-top: 2px solid black; border-bottom: 2px solid black
                 html += '</tr>'
             html += '</table></div>'
             html += '</div></body></html>'
-                                                                                                                                    components.html(html, height=1700, scrolling=True)
+            components.html(html, height=1700, scrolling=True)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
