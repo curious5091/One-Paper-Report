@@ -4,3 +4,5 @@ gspread_dataframe
 pandas
 google-auth
 xlsxwriter
+qrcode
+Pillow
