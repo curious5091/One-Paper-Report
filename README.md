@@ -4,7 +4,7 @@
 
 Streamlit 기반의 경제 지표 시각화 대시보드입니다.
 
-👉 [앱 실행하기](https://one-paper-report.streamlit.app)
+👉 [앱 실행하기](https://oper-ibkeri.streamlit.app)
 
 ---
 
