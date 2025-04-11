@@ -171,8 +171,31 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            from app_util_html import generate_full_html
-            html = generate_full_html(value_map, meta, now, sort_order, country_order, color_map, emerging)
+            html = f'''
+            <html><head><style>
+            @page {{ size: A4 portrait; margin: 5mm; }}
+            body {{ font-family: 'Malgun Gothic'; font-size: 10pt; color: #000; -webkit-print-color-adjust: exact; }}
+            table {{ border-collapse: collapse; width: 100%; margin-bottom: 8px; page-break-inside: avoid; }}
+            th, td {{ border: 1px solid black; padding: 2px; font-size: 8pt; line-height: 1.2; text-align: center; color: #000; }}
+            th:first-child, td:first-child {{ border-left: none; }}
+            th:last-child, td:last-child {{ border-right: none; }}
+            tr:first-child th {{ border-top: 2px solid black; border-bottom: 2px solid black; }}
+            .page-break {{ page-break-before: always; }}
+            @media print {{ .print-button {{ display: none !important; }} }}
+            </style></head><body>
+            <div style="text-align:center; margin-bottom:4px;">
+              <h2 style="margin: 0;">📊 One Page Economy Report - IBK ERI</h2>
+              <div style="font-size:9pt;">기준일시: {now} 기준</div>
+            </div>'''
+
+            for (국가, 지표), 시점값들 in value_map.items():
+                html += f'<h4 style="margin-top:20px;">{국가} - {지표}</h4>'
+                html += '<table><tr><th>기준시점</th><th>값</th></tr>'
+                for 시점, 값 in 시점값들.items():
+                    html += f'<tr><td>{시점}</td><td>{값}</td></tr>'
+                html += '</table>'
+
+            html += '</body></html>'
             components.html(html, height=1800, scrolling=True)
 
             value_map = defaultdict(dict)
