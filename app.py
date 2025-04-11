@@ -14,7 +14,12 @@ credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=sc
 gc = gspread.authorize(credentials)
 
 st.set_page_config(page_title="One Page Economy Report - IBK ERI", layout="wide")
-st.markdown("<h1 style='font-size:24pt; margin-bottom:0pt;'>📊 One Page Economy Report - IBK ERI</h1>", unsafe_allow_html=True)
+st.markdown("""
+    <div style='display: flex; align-items: center; gap: 12px; margin-bottom: 20px;'>
+        <img src='app_icon.png' width='42'/>
+        <h1 style='font-size:24pt; margin:0;'>One Page Economy Report - IBK ERI</h1>
+    </div>
+""", unsafe_allow_html=True), unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
 run_button = st.button("📥 데이터 조회 및 출력")
@@ -100,7 +105,7 @@ if run_button:
             @media print {{ .print-button {{ display: none !important; }} }}
             </style></head><body>
             <div style="text-align:center; margin-bottom:4px;">
-              <h2 style="margin: 0;">📊 One Page Economy Report - IBK ERI</h2>
+              <img src="app_icon.png" style="height:40px; margin-bottom:4px;" />
               <div style="font-size:9pt;">기준일시: {now} 기준</div>
             </div>
             <div class="print-button" style="text-align:right; margin: 10px 0;">
