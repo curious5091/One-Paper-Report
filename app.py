@@ -82,10 +82,7 @@ if run_button:
                 meta[key] = (row['단위'], row['기준점'], row['빈도'])
                 value_map[key][row['기준시점_text']] = format_value(row['값'], row['지표'])
 
-            from datetime import datetime
-now = datetime.now().strftime("%Y-%m-%d %H:%M")
-
-html = f'''
+            html = '''
             <html><head><style>
             @page { size: A4 portrait; margin: 5mm; }
             body {
@@ -116,10 +113,6 @@ html = f'''
               .print-button { display: none !important; }
             }
             </style></head><body>
-<div style="text-align:center; margin-bottom:10px;">
-  <h2 style="margin: 0;">📊 IBK ERI One Page Economy Report</h2>
-  <div style="font-size:9pt;">기준일시: {now} 기준</div>
-</div>
             <div class="print-button" style="text-align:right; margin: 10px 0;">
               <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;">🖨️ 인쇄 또는 PDF 저장</button>
               <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
