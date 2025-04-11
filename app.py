@@ -81,20 +81,22 @@ with col2:
 with col3:
     st.markdown('<button onclick="document.getElementById(\'qrModal\').style.display=\'block\'" style="width:100%; padding:0.5rem 1.2rem; font-size:14px;">📷 QR코드 보기</button>', unsafe_allow_html=True)
 
-st.markdown(f"""
-<div id="qrModal">
-  <div id="qrContent">
-    <div id="closeBtn" onclick="document.getElementById('qrModal').style.display='none'">[닫기]</div>
-    <img src="data:image/png;base64,{qr_b64}" alt="QR 코드" />
-    <p style="margin-top: 10px; font-size: 12px;">휴대폰 카메라로 스캔하여 설치하세요</p>
+st.markdown("""
+<div id=\"qrModal\">
+  <div id=\"qrContent\">
+    <div id=\"closeBtn\" onclick=\"document.getElementById('qrModal').style.display='none'\">[닫기]</div>
+    <img src=\"data:image/png;base64,{qr_b64}\" alt=\"QR 코드\" />
+    <p style=\"margin-top: 10px; font-size: 12px;\">휴대폰 카메라로 스캔하여 설치하세요</p>
   </div>
 </div>
 
 <script>
-document.addEventListener("click", function(event) {
-  const modal = document.getElementById('qrModal');
-  if (event.target == modal) modal.style.display = "none";
-});
+window.addEventListener(\"click\", function(event) {{
+  var modal = document.getElementById('qrModal');
+  if (event.target === modal) {{
+    modal.style.display = \"none\";
+  }}
+}});
 </script>
 """, unsafe_allow_html=True)
 # 'run_button'은 상단 col1 내부에서 정의됨
