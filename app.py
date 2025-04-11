@@ -21,7 +21,7 @@ if run_button:
         try:
             from datetime import datetime
             now = datetime.now().strftime("%Y-%m-%d %H:%M")
-sheet = gc.open_by_key("1OSzr7Kb0CrfFSXaD60BLoPknJDo28kC1B_L6CgxxMOw")
+            sheet = gc.open_by_key("1OSzr7Kb0CrfFSXaD60BLoPknJDo28kC1B_L6CgxxMOw")
             worksheet = sheet.worksheet("Database")
             df = get_as_dataframe(worksheet).dropna(how='all')
             df.columns = df.columns.str.strip()
