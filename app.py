@@ -87,7 +87,7 @@ if run_button:
             
 
 
-html = f'''
+            html = f'''
             <html><head><style>
             @page { size: A4 portrait; margin: 5mm; }
             body {
@@ -209,7 +209,7 @@ html = f'''
                 html += '</tr>'
             html += '</table></div>'
             html += '</div></body></html>'
-            components.html(html, height=1700, scrolling=True)
+                        components.html(html, height=1700, scrolling=True)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
