@@ -231,4 +231,4 @@ if run_button:
             st.error("❌ 오류가 발생했습니다.")
             st.exception(e)
 else:
-    st.info("👆    글로벌 경제지표 조회를 원하실 경우,   상단   '🌏 경제지표 조회 및 출력'   버튼을  눌러주세요.")
+    st.info("👆    글로벌 경제지표 조회를 원하실 경우,   상단&nbsp;&nbsp;&nbsp;&nbsp;   '🌏 경제지표 조회 및 출력'   버튼을  눌러주세요.")
