@@ -13,10 +13,10 @@ st.markdown("<br>", unsafe_allow_html=True)
 cols = st.columns(7)
 
 with cols[0]:
-    run_button_1 = st.button("📊 전체 조회", key="btn1")
+    run_button_1 = st.button("📊 경제지표 조회 및 출력", key="btn1")
 
 with cols[1]:
-    run_button_2 = st.button("🌎 해외 통계", key="btn2")
+    run_button_2 = st.button("🌎 중기지표 조회 및 출력", key="btn2")
 
 # 나머지 컬럼은 비워둠 (추후 버튼 추가용)
 for i in range(2, 7):
@@ -40,9 +40,9 @@ temp_data_2 = pd.DataFrame({
 
 # 버튼 클릭 시 표 출력
 if run_button_1:
-    st.markdown("#### 📊 전체 데이터")
+    st.markdown("#### 📊 경제지표")
     st.dataframe(temp_data_1, use_container_width=True)
 
 elif run_button_2:
-    st.markdown("#### 🌎 해외 데이터")
+    st.markdown("#### 🌎 중기지표")
     st.dataframe(temp_data_2, use_container_width=True)
