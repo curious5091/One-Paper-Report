@@ -13,10 +13,10 @@ st.markdown("<br>", unsafe_allow_html=True)
 cols = st.columns(7)
 
 with cols[0]:
-    run_button_1 = st.button("📊 경제지표 조회 및 출력", key="btn1")
+    run_button_1 = st.button("📊 경제지표 조회 / 출력", key="btn1")
 
 with cols[1]:
-    run_button_2 = st.button("🌎 중기지표 조회 및 출력", key="btn2")
+    run_button_2 = st.button("🌎 중기지표 조회 / 출력", key="btn2")
 
 # 나머지 컬럼은 비워둠 (추후 버튼 추가용)
 for i in range(2, 7):
