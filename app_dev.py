@@ -22,7 +22,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 
-run_button = st.button("📥 데이터 조회 및 출력")
+run_button = st.button("🌏 경제지표 조회 및 출력")
 
 if run_button:
     with st.spinner("⏳ 데이터 로딩 중입니다. 잠시만 기다려주세요..."):
@@ -231,4 +231,4 @@ if run_button:
             st.error("❌ 오류가 발생했습니다.")
             st.exception(e)
 else:
-    st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
+    st.info("👆  상단   '🌏 경제지표 조회 및 출력'   버튼을  눌러주세요.")
