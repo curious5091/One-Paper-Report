@@ -5,7 +5,7 @@ import pandas as pd
 st.set_page_config(layout="wide")
 
 # 타이틀
-st.markdown("<h1 style='text-align: center;'>Dev</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>Dev Page</h1>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center; font-size:10pt;'>made by curious@ibk.co.kr with ChatGPT</div>", unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
