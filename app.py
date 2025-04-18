@@ -32,7 +32,7 @@ if run_button:
             worksheet = sheet.worksheet("Database")
             df = get_as_dataframe(worksheet).dropna(how='all')
             df.columns = df.columns.str.strip()
-            df = df[df['샘플구분'] == 'N']
+#            df = df[df['샘플구분'] == 'N']
             df['기준시점'] = pd.to_datetime(df['기준시점'], format='%Y-%m', errors='coerce')
             df['발표일'] = pd.to_datetime(df['발표일'], errors='coerce')
 
