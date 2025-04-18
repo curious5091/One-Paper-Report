@@ -1,5 +1,5 @@
 import streamlit as st
- import pandas as pd
+import pandas as pd
  
  # 페이지 설정
  st.set_page_config(layout="wide")
