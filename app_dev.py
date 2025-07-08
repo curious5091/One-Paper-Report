@@ -19,7 +19,7 @@ credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=sc
 gc = gspread.authorize(credentials)
 
 spreadsheet_key = "1XJKU1szI5wlLRn7fr0gHHwifYJZbz8PYQlS0R2MfZq4"  # 사용자 원본 코드 기준
-sheet = gc.open_by_key(spreadsheet_key).worksheet("IBK _ERI_ERT_EconomicDatabase_Ver.01")
+sheet = gc.open_by_key(spreadsheet_key).worksheet("Database")
 df_raw = get_as_dataframe(sheet, evaluate_formulas=True)
 df_raw.dropna(how="all", inplace=True)
 df_raw["기준시점"] = pd.to_datetime(df_raw["기준시점"], errors='coerce')
