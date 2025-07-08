@@ -18,7 +18,7 @@ scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=scope)
 gc = gspread.authorize(credentials)
 
-spreadsheet_key = "1XJKU1szI5wlLRn7fr0gHHwifYJZbz8PYQlS0R2MfZq4"  # 사용자 원본 코드 기준
+spreadsheet_key = "1OSzr7Kb0CrfFSXaD60BLoPknJDo28kC1B_L6CgxxMOw"  # 사용자 원본 코드 기준
 try:
     sheet = gc.open_by_key(spreadsheet_key)
     sheet_names = [ws.title for ws in sheet.worksheets()]
