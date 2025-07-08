@@ -19,10 +19,18 @@ credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=sc
 gc = gspread.authorize(credentials)
 
 spreadsheet_key = "1XJKU1szI5wlLRn7fr0gHHwifYJZbz8PYQlS0R2MfZq4"  # 사용자 원본 코드 기준
-sheet = gc.open_by_key(spreadsheet_key).worksheet("Database")
-df_raw = get_as_dataframe(sheet, evaluate_formulas=True)
-df_raw.dropna(how="all", inplace=True)
-df_raw["기준시점"] = pd.to_datetime(df_raw["기준시점"], errors='coerce')
+try:
+    sheet = gc.open_by_key(spreadsheet_key)
+    sheet_names = [ws.title for ws in sheet.worksheets()]
+    if "Database" not in sheet_names:
+        raise ValueError(f"워크시트 이름 오류: 'Database'가 시트에 없습니다. 현재 시트 목록: {sheet_names}")
+    ws = sheet.worksheet("Database")
+    df_raw = get_as_dataframe(ws, evaluate_formulas=True)
+    df_raw.dropna(how="all", inplace=True)
+    df_raw["기준시점"] = pd.to_datetime(df_raw["기준시점"], errors='coerce')
+except Exception as e:
+    st.error(f"📛 구글 시트를 불러오는 중 오류 발생: {e}")
+    st.stop()
 
 # -----------------------------
 # 2. 페이지 설정 및 조회 모드 선택
