@@ -226,6 +226,12 @@ if run_button:
 
             html += '</body></html>'
             components.html(html, height=1700, scrolling=True)
+            + components.html(
+                +     html,
+                +     height=1700,
+            +     scrolling=True,
+            +     width=1200    # ← 추가: iframe 너비를 넉넉히 지정
+            + )
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
