@@ -223,8 +223,9 @@ if run_button:
                     html += f'<td>{value_map[k].get(p, "")}</td>'
                 html += '</tr>'
             html += '</table></div>'
+            
             html += '</body></html>'
-            st.markdown(html, unsafe_allow_html=True)
+            components.html(html, height=1700, scrolling=True, width=1700)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
