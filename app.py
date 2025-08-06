@@ -224,7 +224,7 @@ if run_button:
                 html += '</tr>'
             html += '</table></div>'
 
-           st.markdown(html, unsafe_allow_html=True)
+st.markdown(html, unsafe_allow_html=True)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
