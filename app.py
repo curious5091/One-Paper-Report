@@ -225,7 +225,7 @@ if run_button:
             html += '</table></div>'
 
             html += '</body></html>'
-            components.html(html, height=1700, scrolling=True, width=1200)
+            components.html(html, height=1700, scrolling=False, width=1700)
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
