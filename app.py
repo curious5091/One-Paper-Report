@@ -52,7 +52,7 @@ if run_button:
 
             def extract_recent(group):
                 freq = group['빈도'].iloc[0]
-                n = 8 if group['지표'].iloc[0] == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 6)
+                n = 8 if group['지표'].iloc[0] == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 12)
                 return group.sort_values('기준시점', ascending=False).head(n)
 
             grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
@@ -134,7 +134,7 @@ if run_button:
                     html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
                     html += '</tr></table>'
 
-                keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 6]
+                keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 12]
                 if keys6:
                     all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
                     html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
