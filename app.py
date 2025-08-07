@@ -52,7 +52,7 @@ if run_button:
 
             def extract_recent(group):
                 freq = group['빈도'].iloc[0]
-                n = 8 if group['지표'].iloc[0] == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 8)
+                n = 8 if group['지표'].iloc[0] == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 6)
                 return group.sort_values('기준시점', ascending=False).head(n)
 
             grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
