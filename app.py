@@ -136,7 +136,7 @@ if run_button:
 
                 keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 12]
                 if keys6:
-                    all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
+                    all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:12][::-1]
                     html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
                     for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
                         unit, base, _ = meta[k]
@@ -170,9 +170,9 @@ if run_button:
                     html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
                     html += '</tr></table>'
 
-                keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 6]
+                keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 12]
                 if keys6:
-                    all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
+                    all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:12][::-1]
                     html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
                     for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
                         unit, base, _ = meta[k]
@@ -206,7 +206,7 @@ if run_button:
             html += '</table>'
 
             keys_etc = [k for k in value_map if k[0] in emerging and k[1] not in ['GDP(연간)', 'GDP(분기)']]
-            all_periods = sorted({p for k in keys_etc for p in value_map[k]}, reverse=True)[:6][::-1]
+            all_periods = sorted({p for k in keys_etc for p in value_map[k]}, reverse=True)[:12][::-1]
             html += '<table><tr><th>국가</th><th>지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
             last_country = None
             rowspan = defaultdict(int)
