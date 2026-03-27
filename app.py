@@ -229,6 +229,6 @@ if run_button:
 
         except Exception as e:
             st.error("❌ 오류가 발생했습니다.")
-            st.exception(e)
+            st.exception(e) 
 else:
     st.info("👆  상단   '📥 데이터 조회 및 출력'   버튼을  눌러주세요.")
