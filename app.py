@@ -16,7 +16,7 @@ gc = gspread.authorize(credentials)
 st.set_page_config(page_title="One Page Economic Report - IBK ERI", layout="wide")
 st.markdown(f"""
     <div style='display: flex; align-items: center; gap: 12px; margin-bottom: 20px;'>
-        <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='50'/>
+        <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='70'/>
         <h1 style='font-size:24pt; margin:0;'>One Page Economic Report - IBK ERI</h1>
     </div>
 """, unsafe_allow_html=True)
