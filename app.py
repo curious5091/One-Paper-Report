@@ -16,7 +16,7 @@ gc = gspread.authorize(credentials)
 st.set_page_config(page_title="One Page Economic Report - IBK ERI", layout="wide")
 st.markdown(f"""
     <div style='display: flex; align-items: center; gap: 12px; margin-bottom: 20px;'>
-        <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='100'/>
+        <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width=100'/>
         <h1 style='font-size:24pt; margin:0;'>One Page Economic Report - IBK ERI</h1>
     </div>
 """, unsafe_allow_html=True)
@@ -53,7 +53,11 @@ if run_button:
             def extract_recent(group):
                 freq = group['빈도'].iloc[0]
                 n = 8 if group.name[1] == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 6)
-                return group.sort_values('기준시점', ascending=False).head(n)
+                res = group.sort_values('기준시점', ascending=False).head(n).copy()
+                # Pandas 버전에 따라 그룹핑 기준 열이 반환 시 누락되는 것을 막기 위해 명시적으로 값 재할당
+                res['국가'] = group.name[0]
+                res['지표'] = group.name[1]
+                return res
 
             grouped = df_deduped.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
 
