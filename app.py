@@ -26,7 +26,7 @@ st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made b
 if 'view_mode' not in st.session_state:
     st.session_state.view_mode = None
 
-# 2. 데이터 로딩 및 전처리 함수 (중복 제거 포함)
+# 2. 데이터 로딩 및 전처리 함수
 @st.cache_data(ttl=600)
 def get_clean_data():
     sheet = gc.open_by_key("1OSzr7Kb0CrfFSXaD60BLoPknJDo28kC1B_L6CgxxMOw")
@@ -48,8 +48,6 @@ def get_clean_data():
         return d.strftime('%Y-%m')
 
     df['기준시점_text'] = df.apply(format_period, axis=1)
-
-    # 동일 기준시점 중 최신 발표일만 남기기
     df_clean = df.sort_values(['국가', '지표', '기준시점', '발표일'], ascending=[True, True, False, False])
     df_clean = df_clean.drop_duplicates(subset=['국가', '지표', '기준시점_text'], keep='first')
     
@@ -72,40 +70,37 @@ if st.session_state.view_mode:
 
             # --- [MODE 1] 인쇄용 리포트 ---
             if st.session_state.view_mode == 'report':
-                def extract_recent(group):
-                    # group.name은 (국가, 지표) 튜플임
-                    indicator_name = group.name[1]
-                    freq = group['빈도'].iloc[0]
-                    
-                    if indicator_name == 'GDP(분기)': n = 8
-                    elif freq in ['연도', '분기']: n = 4
-                    else: n = 12 
-                    
-                    res = group.sort_values('기준시점', ascending=False).head(n).copy()
-                    return res
-
-                # groupby 이후 인덱스를 완전히 초기화하여 '국가', '지표' 컬럼을 확보
-                grouped = df.groupby(['국가', '지표'], group_keys=False).apply(extract_recent).reset_index(drop=True)
-
-                omit_base = {'기준금리'}
-                sort_order = {'기준금리': 0, '실업률': 1, 'PCE': 2, 'CPI': 3, 'PPI': 4, '무역수지': 5, '수출': 6, '수입': 7, '소매판매': 8, '산업생산': 9}
-                color_map = {'한국': '#f9f9f9', '미국': '#e6f0ff', '중국': '#ffe6e6', '일본': '#f3e6ff', '유로존': '#e6ffe6'}
-
                 value_map = defaultdict(dict)
                 meta = {}
                 
-                # 에러 발생 지점 수정: 안전하게 컬럼 존재 확인 후 루프
-                for _, row in grouped.iterrows():
-                    c_name = row['국가']
-                    i_name = row['지표']
-                    key = (c_name, i_name)
-                    meta[key] = (row['단위'], row['기준점'], row['빈도'])
+                # 핵심 수정: groupby 결과를 직접 순회하여 컬럼명 에러 원천 차단
+                grouped_obj = df.groupby(['국가', '지표'])
+                
+                for (c_name, i_name), group in grouped_obj:
+                    freq = group['빈도'].iloc[0]
+                    if i_name == 'GDP(분기)': n = 8
+                    elif freq in ['연도', '분기']: n = 4
+                    else: n = 12
                     
-                    val = row['값']
-                    try:
-                        f_val = f"{float(val):,.2f}" if i_name == '기준금리' else f"{float(val):,.1f}"
-                    except: f_val = ""
-                    value_map[key][row['기준시점_text']] = f_val
+                    recent_data = group.sort_values('기준시점', ascending=False).head(n)
+                    key = (c_name, i_name)
+                    
+                    # 메타 정보 저장
+                    first_row = recent_data.iloc[0]
+                    meta[key] = (first_row['단위'], first_row['기준점'], freq)
+                    
+                    # 값 저장
+                    for _, row in recent_data.iterrows():
+                        val = row['값']
+                        try:
+                            f_val = f"{float(val):,.2f}" if i_name == '기준금리' else f"{float(val):,.1f}"
+                        except: f_val = ""
+                        value_map[key][row['기준시점_text']] = f_val
+
+                # HTML 생성 로직
+                omit_base = {'기준금리'}
+                sort_order = {'기준금리': 0, '실업률': 1, 'PCE': 2, 'CPI': 3, 'PPI': 4, '무역수지': 5, '수출': 6, '수입': 7, '소매판매': 8, '산업생산': 9}
+                color_map = {'한국': '#f9f9f9', '미국': '#e6f0ff', '중국': '#ffe6e6', '일본': '#f3e6ff', '유로존': '#e6ffe6'}
 
                 html = f'''
                 <html><head><style>
@@ -113,7 +108,7 @@ if st.session_state.view_mode:
                 body {{ font-family: "Malgun Gothic"; font-size: 10pt; color: #000; }}
                 table {{ border-collapse: collapse; width: 100%; margin-bottom: 8px; page-break-inside: avoid; }}
                 th, td {{ border: 1px solid black; padding: 2px; font-size: 8pt; text-align: center; color: #000; }}
-                h3 {{ margin: 5px 0; font-size: 11pt; }}
+                h3 {{ margin: 10px 0 5px 0; font-size: 11pt; border-left: 5px solid #333; padding-left: 10px; }}
                 </style></head><body>
                 <div style="text-align:center; font-size:13pt; font-weight: bold;">One Page Economic Report</div>
                 <div style="text-align:center; font-size:8.5pt; margin-bottom:10px;">기준일시: {now}</div>
@@ -121,23 +116,18 @@ if st.session_state.view_mode:
                 
                 for country in ['한국', '미국', '중국', '일본', '유로존']:
                     bg_color = color_map.get(country, '#ffffff')
-                    html += f'<div style="background-color:{bg_color}; padding:6px; margin-bottom:10px; border:1px solid #ccc;">'
+                    html += f'<div style="background-color:{bg_color}; padding:8px; margin-bottom:15px; border:1px solid #ddd;">'
                     html += f'<h3>{country}</h3>'
                     
-                    # 해당 국가의 지표 키값들 추출
                     keys = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)']]
-                    
                     if keys:
-                        # 최근 12개월(또는 데이터 개수만큼) 기간 추출
                         all_p = sorted({p for k in keys for p in value_map[k]}, reverse=True)[:12][::-1]
-                        html += '<table><tr><th>지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_p) + '</tr>'
-                        
+                        html += '<table><tr><th style="width:150px;">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_p) + '</tr>'
                         for k in sorted(keys, key=lambda x: sort_order.get(x[1], 99)):
                             unit, base, _ = meta[k]
                             b_text = f", {base}" if k[1] not in omit_base and not pd.isna(base) and base != '-' else ""
                             html += f'<tr><td style="text-align:left; padding-left:5px;"><b>{k[1]}</b> <span style="font-size:7pt;">({unit}{b_text})</span></td>'
-                            for p in all_p:
-                                html += f'<td>{value_map[k].get(p, "")}</td>'
+                            html += ''.join(f'<td>{value_map[k].get(p, "")}</td>' for p in all_p)
                             html += '</tr>'
                         html += '</table>'
                     html += '</div>'
