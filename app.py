@@ -35,7 +35,7 @@ def get_clean_data():
     df = get_as_dataframe(worksheet).dropna(how='all')
     df.columns = df.columns.str.strip()
     
-    # 숫자형 데이터 변환 (에러 시 NaN)
+    # 숫자형 데이터 변환 및 날짜 처리
     df['값'] = pd.to_numeric(df['값'], errors='coerce')
     df['기준시점'] = pd.to_datetime(df['기준시점'], format='%Y-%m', errors='coerce')
     df['발표일'] = pd.to_datetime(df['발표일'], errors='coerce')
@@ -52,12 +52,13 @@ def get_clean_data():
 
     df['기준시점_text'] = df.apply(format_period, axis=1)
     
-    # 중복 제거: 동일 기준시점 중 최신 발표일만 남기기
+    # 중복 제거 및 유효 값 필터링
     df_clean = df.sort_values(['국가', '지표', '기준시점', '발표일'], ascending=[True, True, False, False])
     df_clean = df_clean.drop_duplicates(subset=['국가', '지표', '기준시점_text'], keep='first')
-    
-    # 실제 '값'이 존재하는 데이터만 필터링
     df_clean = df_clean[df_clean['값'].notna()]
+    
+    # [추가] 일본의 경우 '단칸' 지표 제외 로직
+    df_clean = df_clean[~((df_clean['국가'] == '일본') & (df_clean['지표'].str.contains('단칸', na=False)))]
     
     return df_clean
 
@@ -90,7 +91,6 @@ if st.session_state.view_mode:
                 value_map = defaultdict(dict)
                 meta = {}
                 
-                # 국가/지표별로 묶어서 처리
                 grouped_obj = df.groupby(['국가', '지표'])
                 for (c_name, i_name), group in grouped_obj:
                     freq = group['빈도'].iloc[0]
@@ -137,14 +137,12 @@ if st.session_state.view_mode:
                 
                 for country in display_order:
                     bg_color = color_map.get(country, '#ffffff')
-                    # 해당 국가의 유효 지표 추출
-                    country_keys = [k for k in value_map if k[0] == country and value_map[k]]
+                    country_keys = [k for k in value_map if k[0] == country]
                     if not country_keys: continue
 
                     html += f'<div style="background-color:{bg_color}; padding:8px; margin-bottom:15px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
                     
-                    # GDP 섹션
                     key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
                     show_y = key_y in country_keys
                     show_q = key_q in country_keys
@@ -160,7 +158,6 @@ if st.session_state.view_mode:
                         html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in p_q)
                         html += '</tr></table>'
 
-                    # 주요 지표 섹션
                     other_keys = [k for k in country_keys if k[1] not in ['GDP(연간)', 'GDP(분기)']]
                     if other_keys:
                         all_p = sorted({p for k in other_keys for p in value_map[k]}, reverse=True)[:12][::-1]
@@ -186,8 +183,6 @@ if st.session_state.view_mode:
                 target_country = st.selectbox("조회할 국가를 선택하세요", sorted_countries)
                 
                 c_df = df[df['국가'] == target_country].copy()
-                
-                # 해당 국가 내에 실제 데이터(NaN 아님)가 존재하는 지표만 필터링
                 present_inds = c_df['지표'].unique()
                 sorted_indicators = [i for i in indicator_order if i in present_inds] + [i for i in sorted(present_inds) if i not in indicator_order]
                 
@@ -218,7 +213,7 @@ if st.session_state.view_mode:
                                     'height': 300
                                 })
                 else:
-                    st.warning("선택한 국가에 표시할 데이터가 없습니다.")
+                    st.warning("표시할 지표 데이터가 없습니다.")
 
         except Exception as e:
             st.error("데이터 처리 중 오류 발생")
