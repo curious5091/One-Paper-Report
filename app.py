@@ -19,7 +19,7 @@ st.set_page_config(page_title="One Page Economic Report - IBK ERI", layout="wide
 st.markdown(f"""
     <div style='display: flex; align-items: center; gap: 12px; margin-bottom: 20px;'>
         <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='100'/>
-        <h1 style='font-size:24pt; margin:0;'>One Page Economic Report - IBK ERI   (v.2.0)</h1>
+        <h1 style='font-size:24pt; margin:0;'>One Page Economic Report - IBK ERI   (ver.2.0)</h1>
     </div>
 """, unsafe_allow_html=True)
 st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>Made by curious@ibk.co.kr with ChatGPT / Version up with Gemini</div>", unsafe_allow_html=True)
