@@ -54,8 +54,9 @@ def get_clean_data():
     
     return df_clean
 
-# 상단 버튼
-col_btn1, col_btn2 = st.columns(2)
+# 상단 버튼 (가로폭 조정 및 왼쪽 정렬)
+# [1, 1, 4] 비율로 설정하여 버튼 2개가 앞쪽(왼쪽)에 모이고 나머지는 공백으로 둡니다.
+col_btn1, col_btn2, col_spacer = st.columns([1, 1, 4])
 with col_btn1:
     if st.button("📥 인쇄용 리포트 조회", use_container_width=True):
         st.session_state.view_mode = 'report'
