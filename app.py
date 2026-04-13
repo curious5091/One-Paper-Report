@@ -52,7 +52,7 @@ if run_button:
 
             def extract_recent(group):
                 freq = group['빈도'].iloc[0]
-                n = 8 if group.name[1] == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 12)
+                n = 8 if group.name[1] == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 6)
                 res = group.sort_values('기준시점', ascending=False).head(n).copy()
                 # Pandas 버전에 따라 그룹핑 기준 열이 반환 시 누락되는 것을 막기 위해 명시적으로 값 재할당
                 res['국가'] = group.name[0]
