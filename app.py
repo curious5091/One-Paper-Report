@@ -55,7 +55,6 @@ def get_clean_data():
     return df_clean
 
 # 상단 버튼 (가로폭 조정 및 왼쪽 정렬)
-# [1, 1, 4] 비율로 설정하여 버튼 2개가 앞쪽(왼쪽)에 모이고 나머지는 공백으로 둡니다.
 col_btn1, col_btn2, col_spacer = st.columns([1, 1, 4])
 with col_btn1:
     if st.button("📥 인쇄용 리포트 조회", use_container_width=True):
@@ -86,6 +85,7 @@ if st.session_state.view_mode:
                     for _, row in recent_data.iterrows():
                         val = row['값']
                         try:
+                            # 기준금리는 소수점 둘째자리, 나머지는 첫째자리
                             f_val = f"{float(val):,.2f}" if i_name == '기준금리' else f"{float(val):,.1f}"
                         except: f_val = ""
                         value_map[key][row['기준시점_text']] = f_val
@@ -130,6 +130,7 @@ if st.session_state.view_mode:
                     html += f'<div style="background-color:{bg_color}; padding:8px; margin-bottom:15px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
                     
+                    # 1. GDP 테이블 복구
                     key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
                     if key_y in value_map or key_q in value_map:
                         periods_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1]
@@ -142,6 +143,7 @@ if st.session_state.view_mode:
                         html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
                         html += '</tr></table>'
 
+                    # 2. 주요 지표 테이블
                     keys = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)']]
                     if keys:
                         all_p = sorted({p for k in keys for p in value_map[k]}, reverse=True)[:12][::-1]
@@ -158,7 +160,7 @@ if st.session_state.view_mode:
                 html += '</body></html>'
                 components.html(html, height=1200, scrolling=True, width=1700)
 
-            # --- [MODE 2] 대시보드 시각화 (Y축 최적화 버전) ---
+            # --- [MODE 2] 대시보드 시각화 (Y축 최적화 및 소수점 표시) ---
             elif st.session_state.view_mode == 'dashboard':
                 st.subheader("📊 경제 지표 시각화 대시보드")
                 target_country = st.selectbox("조회할 국가를 선택하세요", sorted(df['국가'].unique()))
@@ -181,7 +183,8 @@ if st.session_state.view_mode:
                                             'field': '값', 
                                             'type': 'quantitative', 
                                             'title': '수치',
-                                            'scale': {'zero': False, 'padding': 10}
+                                            'axis': {'format': '.1f'}, # Y축 눈금 소수점 표시
+                                            'scale': {'zero': False, 'padding': 20} # 0 강제 해제 및 여백
                                         },
                                         'color': {'value': '#007bff'}
                                     },
