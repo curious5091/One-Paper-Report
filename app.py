@@ -22,7 +22,7 @@ st.markdown(f"""
         <h1 style='font-size:24pt; margin:0;'>One Page Economic Report - IBK ERI</h1>
     </div>
 """, unsafe_allow_html=True)
-st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>made by curious@ibk.co.kr with ChatGPT / Version up with Gemini</div>", unsafe_allow_html=True)
+st.markdown("<div style='font-size:10pt; color:#555; margin-bottom:20px;'>Made by curious@ibk.co.kr with ChatGPT / Version up with Gemini</div>", unsafe_allow_html=True)
 
 if 'view_mode' not in st.session_state:
     st.session_state.view_mode = None
