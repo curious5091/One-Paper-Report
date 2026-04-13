@@ -15,6 +15,7 @@ gc = gspread.authorize(credentials)
 
 st.set_page_config(page_title="One Page Economic Report - IBK ERI", layout="wide")
 
+# 화면 표시용 헤더
 st.markdown(f"""
     <div style='display: flex; align-items: center; gap: 12px; margin-bottom: 20px;'>
         <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='100'/>
@@ -73,23 +74,13 @@ if st.session_state.view_mode:
                 value_map = defaultdict(dict)
                 meta = {}
                 
-                # 핵심 수정: groupby 결과를 직접 순회하여 컬럼명 에러 원천 차단
                 grouped_obj = df.groupby(['국가', '지표'])
-                
                 for (c_name, i_name), group in grouped_obj:
                     freq = group['빈도'].iloc[0]
-                    if i_name == 'GDP(분기)': n = 8
-                    elif freq in ['연도', '분기']: n = 4
-                    else: n = 12
-                    
+                    n = 8 if i_name == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 12)
                     recent_data = group.sort_values('기준시점', ascending=False).head(n)
                     key = (c_name, i_name)
-                    
-                    # 메타 정보 저장
-                    first_row = recent_data.iloc[0]
-                    meta[key] = (first_row['단위'], first_row['기준점'], freq)
-                    
-                    # 값 저장
+                    meta[key] = (recent_data.iloc[0]['단위'], recent_data.iloc[0]['기준점'], freq)
                     for _, row in recent_data.iterrows():
                         val = row['값']
                         try:
@@ -97,28 +88,53 @@ if st.session_state.view_mode:
                         except: f_val = ""
                         value_map[key][row['기준시점_text']] = f_val
 
-                # HTML 생성 로직
                 omit_base = {'기준금리'}
                 sort_order = {'기준금리': 0, '실업률': 1, 'PCE': 2, 'CPI': 3, 'PPI': 4, '무역수지': 5, '수출': 6, '수입': 7, '소매판매': 8, '산업생산': 9}
-                color_map = {'한국': '#f9f9f9', '미국': '#e6f0ff', '중국': '#ffe6e6', '일본': '#f3e6ff', '유로존': '#e6ffe6'}
+                
+                all_found_countries = sorted(df['국가'].unique())
+                main_countries = ['한국', '미국', '중국', '일본', '유로존']
+                display_order = [c for c in main_countries if c in all_found_countries] + [c for c in all_found_countries if c not in main_countries]
+                color_map = {'한국': '#f9f9f9', '미국': '#e6f0ff', '중국': '#ffe6e6', '일본': '#f3e6ff', '유로존': '#e6ffe6', '베트남': '#fff7e6'}
 
                 html = f'''
                 <html><head><style>
                 @page {{ size: A4 portrait; margin: 5mm; }}
-                body {{ font-family: "Malgun Gothic"; font-size: 10pt; color: #000; }}
+                body {{ font-family: "Malgun Gothic"; font-size: 10pt; color: #000; -webkit-print-color-adjust: exact; }}
                 table {{ border-collapse: collapse; width: 100%; margin-bottom: 8px; page-break-inside: avoid; }}
                 th, td {{ border: 1px solid black; padding: 2px; font-size: 8pt; text-align: center; color: #000; }}
                 h3 {{ margin: 10px 0 5px 0; font-size: 11pt; border-left: 5px solid #333; padding-left: 10px; }}
+                .print-button-container {{ text-align: right; margin-bottom: 20px; }}
+                .print-button {{ padding: 8px 16px; font-weight: bold; cursor: pointer; border: 2px solid #333; background: #fff; }}
+                @media print {{ .print-button-container {{ display: none !important; }} }}
                 </style></head><body>
-                <div style="text-align:center; font-size:13pt; font-weight: bold;">One Page Economic Report</div>
-                <div style="text-align:center; font-size:8.5pt; margin-bottom:10px;">기준일시: {now}</div>
+                <div class="print-button-container">
+                    <button class="print-button" onclick="window.print()">🖨️ 인쇄 또는 PDF 저장</button>
+                    <p style="font-size:8pt; color:#666; margin-top:5px;">* PDF 저장 시 '배경 그래픽' 옵션을 체크해 주세요.</p>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom:5px;">
+                    <img src="https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png" style="height:34px;" />
+                    <div style="font-size:13pt; font-weight: bold;">One Page Economic Report - IBK ERI</div>
+                </div>
+                <div style="text-align:center; font-size:8.5pt; margin-bottom:15px;">기준일시: {now}</div>
                 '''
                 
-                for country in ['한국', '미국', '중국', '일본', '유로존']:
+                for country in display_order:
                     bg_color = color_map.get(country, '#ffffff')
-                    html += f'<div style="background-color:{bg_color}; padding:8px; margin-bottom:15px; border:1px solid #ddd;">'
+                    html += f'<div style="background-color:{bg_color}; padding:8px; margin-bottom:15px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
                     
+                    key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
+                    if key_y in value_map or key_q in value_map:
+                        periods_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1]
+                        periods_q = sorted(value_map[key_q].keys(), reverse=True)[:8][::-1]
+                        html += '<table><tr>'
+                        if periods_y: html += f'<th colspan="{len(periods_y)}"><b>GDP(연간)</b> ({meta[key_y][0]})</th>'
+                        if periods_q: html += f'<th colspan="{len(periods_q)}"><b>GDP(분기)</b> ({meta[key_q][0]})</th>'
+                        html += '</tr><tr>' + ''.join(f'<th>{p}</th>' for p in periods_y + periods_q) + '</tr><tr>'
+                        html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in periods_y)
+                        html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
+                        html += '</tr></table>'
+
                     keys = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)']]
                     if keys:
                         all_p = sorted({p for k in keys for p in value_map[k]}, reverse=True)[:12][::-1]
@@ -133,17 +149,15 @@ if st.session_state.view_mode:
                     html += '</div>'
                 
                 html += '</body></html>'
-                components.html(html, height=1000, scrolling=True, width=1700)
+                components.html(html, height=1200, scrolling=True, width=1700)
 
             # --- [MODE 2] 대시보드 시각화 ---
             elif st.session_state.view_mode == 'dashboard':
                 st.subheader("📊 경제 지표 시각화 대시보드")
                 target_country = st.selectbox("조회할 국가를 선택하세요", sorted(df['국가'].unique()))
                 c_df = df[df['국가'] == target_country].copy()
-                
                 all_inds = sorted(c_df['지표'].unique())
                 selected_inds = st.multiselect("확인할 지표를 선택하세요", all_inds, default=[i for i in ['CPI', '산업생산', '기준금리'] if i in all_inds])
-                
                 if selected_inds:
                     cols = st.columns(2)
                     for i, ind in enumerate(selected_inds):
@@ -156,7 +170,7 @@ if st.session_state.view_mode:
                     st.warning("지표를 선택해주세요.")
 
         except Exception as e:
-            st.error("데이터 처리 중 오류가 발생했습니다.")
+            st.error("데이터 처리 중 오류 발생")
             st.exception(e)
 else:
     st.info("👆 버튼을 눌러 조회 방식을 선택하세요.")
