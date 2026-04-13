@@ -52,7 +52,7 @@ if run_button:
 
             def extract_recent(group):
                 freq = group['빈도'].iloc[0]
-                n = 8 if group.name[1] == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 6)
+                n = 8 if group.name[1] == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 12)
                 res = group.sort_values('기준시점', ascending=False).head(n).copy()
                 # Pandas 버전에 따라 그룹핑 기준 열이 반환 시 누락되는 것을 막기 위해 명시적으로 값 재할당
                 res['국가'] = group.name[0]
@@ -138,13 +138,13 @@ if run_button:
                     html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
                     html += '</tr></table>'
 
-                keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 6]
-                if keys6:
-                    all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
+                keys12 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 12]
+                if keys12:
+                    all_periods = sorted({p for k in keys12 for p in value_map[k]}, reverse=True)[:12][::-1]
                     html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
-                    for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
+                    for i, k in enumerate(sorted(keys12, key=lambda x: sort_order.get(x[1], 99))):
                         unit, base, _ = meta[k]
-                        row_style = ' style="border-bottom:2px solid black;"' if i == len(keys6)-1 else ''
+                        row_style = ' style="border-bottom:2px solid black;"' if i == len(keys12)-1 else ''
                         html += f'<tr{row_style}><td class="label">{format_label(k[1], unit, base)}</td>'
                         for p in all_periods:
                             html += f'<td>{value_map[k].get(p, "")}</td>'
@@ -174,13 +174,13 @@ if run_button:
                     html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
                     html += '</tr></table>'
 
-                keys6 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 6]
-                if keys6:
-                    all_periods = sorted({p for k in keys6 for p in value_map[k]}, reverse=True)[:6][::-1]
+                keys12 = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)'] and len(value_map[k]) == 12]
+                if keys12:
+                    all_periods = sorted({p for k in keys12 for p in value_map[k]}, reverse=True)[:12][::-1]
                     html += '<table><tr><th class="label">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
-                    for i, k in enumerate(sorted(keys6, key=lambda x: sort_order.get(x[1], 99))):
+                    for i, k in enumerate(sorted(keys12, key=lambda x: sort_order.get(x[1], 99))):
                         unit, base, _ = meta[k]
-                        row_style = ' style="border-bottom:2px solid black;"' if i == len(keys6)-1 else ''
+                        row_style = ' style="border-bottom:2px solid black;"' if i == len(keys12)-1 else ''
                         html += f'<tr{row_style}><td class="label">{format_label(k[1], unit, base)}</td>'
                         for p in all_periods:
                             html += f'<td>{value_map[k].get(p, "")}</td>'
@@ -210,7 +210,7 @@ if run_button:
             html += '</table>'
 
             keys_etc = [k for k in value_map if k[0] in emerging and k[1] not in ['GDP(연간)', 'GDP(분기)']]
-            all_periods = sorted({p for k in keys_etc for p in value_map[k]}, reverse=True)[:6][::-1]
+            all_periods = sorted({p for k in keys_etc for p in value_map[k]}, reverse=True)[:12][::-1]
             html += '<table><tr><th>국가</th><th>지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_periods) + '</tr>'
             last_country = None
             rowspan = defaultdict(int)
