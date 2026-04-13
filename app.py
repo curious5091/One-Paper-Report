@@ -85,7 +85,6 @@ if st.session_state.view_mode:
                     for _, row in recent_data.iterrows():
                         val = row['값']
                         try:
-                            # 기준금리는 소수점 둘째자리, 나머지는 첫째자리
                             f_val = f"{float(val):,.2f}" if i_name == '기준금리' else f"{float(val):,.1f}"
                         except: f_val = ""
                         value_map[key][row['기준시점_text']] = f_val
@@ -130,7 +129,6 @@ if st.session_state.view_mode:
                     html += f'<div style="background-color:{bg_color}; padding:8px; margin-bottom:15px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
                     
-                    # 1. GDP 테이블 복구
                     key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
                     if key_y in value_map or key_q in value_map:
                         periods_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1]
@@ -143,7 +141,6 @@ if st.session_state.view_mode:
                         html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
                         html += '</tr></table>'
 
-                    # 2. 주요 지표 테이블
                     keys = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)']]
                     if keys:
                         all_p = sorted({p for k in keys for p in value_map[k]}, reverse=True)[:12][::-1]
@@ -160,13 +157,17 @@ if st.session_state.view_mode:
                 html += '</body></html>'
                 components.html(html, height=1200, scrolling=True, width=1700)
 
-            # --- [MODE 2] 대시보드 시각화 (Y축 최적화 및 소수점 표시) ---
+            # --- [MODE 2] 대시보드 시각화 ---
             elif st.session_state.view_mode == 'dashboard':
                 st.subheader("📊 경제 지표 시각화 대시보드")
                 target_country = st.selectbox("조회할 국가를 선택하세요", sorted(df['국가'].unique()))
                 c_df = df[df['국가'] == target_country].copy()
                 all_inds = sorted(c_df['지표'].unique())
-                selected_inds = st.multiselect("확인할 지표를 선택하세요", all_inds, default=[i for i in ['CPI', '산업생산', '기준금리'] if i in all_inds])
+                
+                # 기본 선택 지표를 요청하신 순서대로 설정
+                default_selection = [i for i in ['GDP(연간)', 'GDP(분기)', '기준금리', 'CPI'] if i in all_inds]
+                
+                selected_inds = st.multiselect("확인할 지표를 선택하세요", all_inds, default=default_selection)
                 
                 if selected_inds:
                     cols = st.columns(2)
@@ -183,8 +184,8 @@ if st.session_state.view_mode:
                                             'field': '값', 
                                             'type': 'quantitative', 
                                             'title': '수치',
-                                            'axis': {'format': '.1f'}, # Y축 눈금 소수점 표시
-                                            'scale': {'zero': False, 'padding': 20} # 0 강제 해제 및 여백
+                                            'axis': {'format': '.1f'},
+                                            'scale': {'zero': False, 'padding': 20}
                                         },
                                         'color': {'value': '#007bff'}
                                     },
