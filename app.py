@@ -70,6 +70,10 @@ if st.session_state.view_mode:
             df = get_clean_data()
             now = datetime.now(timezone('Asia/Seoul')).strftime("%Y-%m-%d %H:%M")
 
+            # 정렬 기준 정의
+            country_order = ['한국', '미국', '중국', '일본', '유로존', '베트남', '인도', '인도네시아', '폴란드']
+            indicator_order = ['GDP(연간)', 'GDP(분기)', '기준금리', '실업률', 'PCE', 'CPI', 'PPI', '무역수지', '수출', '수입', '소매판매', '산업생산', '부동산투자', '실질임금']
+
             # --- [MODE 1] 인쇄용 리포트 ---
             if st.session_state.view_mode == 'report':
                 value_map = defaultdict(dict)
@@ -90,11 +94,9 @@ if st.session_state.view_mode:
                         value_map[key][row['기준시점_text']] = f_val
 
                 omit_base = {'기준금리'}
-                sort_order = {'기준금리': 0, '실업률': 1, 'PCE': 2, 'CPI': 3, 'PPI': 4, '무역수지': 5, '수출': 6, '수입': 7, '소매판매': 8, '산업생산': 9}
                 
-                all_found_countries = sorted(df['국가'].unique())
-                main_countries = ['한국', '미국', '중국', '일본', '유로존']
-                display_order = [c for c in main_countries if c in all_found_countries] + [c for c in all_found_countries if c not in main_countries]
+                all_found_countries = df['국가'].unique()
+                display_order = [c for c in country_order if c in all_found_countries] + [c for c in sorted(all_found_countries) if c not in country_order]
                 
                 color_map = {
                     '한국': '#f9f9f9', '미국': '#e6f0ff', '중국': '#ffe6e6', 
@@ -145,7 +147,10 @@ if st.session_state.view_mode:
                     if keys:
                         all_p = sorted({p for k in keys for p in value_map[k]}, reverse=True)[:12][::-1]
                         html += '<table><tr><th style="width:150px;">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_p) + '</tr>'
-                        for k in sorted(keys, key=lambda x: sort_order.get(x[1], 99)):
+                        
+                        # 인쇄용 리포트 지표 정렬 (기존 유지 혹은 통일)
+                        report_sort = {ind: i for i, ind in enumerate(indicator_order)}
+                        for k in sorted(keys, key=lambda x: report_sort.get(x[1], 99)):
                             unit, base, _ = meta[k]
                             b_text = f", {base}" if k[1] not in omit_base and not pd.isna(base) and base != '-' else ""
                             html += f'<tr><td style="text-align:left; padding-left:5px;"><b>{k[1]}</b> <span style="font-size:7pt;">({unit}{b_text})</span></td>'
@@ -160,14 +165,22 @@ if st.session_state.view_mode:
             # --- [MODE 2] 대시보드 시각화 ---
             elif st.session_state.view_mode == 'dashboard':
                 st.subheader("📊 경제 지표 시각화 대시보드")
-                target_country = st.selectbox("조회할 국가를 선택하세요", sorted(df['국가'].unique()))
+                
+                # 1. 국가 드롭다운 순서 고정
+                all_found_countries = df['국가'].unique()
+                sorted_countries = [c for c in country_order if c in all_found_countries] + [c for c in sorted(all_found_countries) if c not in country_order]
+                target_country = st.selectbox("조회할 국가를 선택하세요", sorted_countries)
+                
                 c_df = df[df['국가'] == target_country].copy()
-                all_inds = sorted(c_df['지표'].unique())
                 
-                # 기본 선택 지표를 요청하신 순서대로 설정
-                default_selection = [i for i in ['GDP(연간)', 'GDP(분기)', '기준금리', 'CPI'] if i in all_inds]
+                # 2. 해당 국가에 존재하는 지표만 필터링하여 순서 고정
+                present_inds = c_df['지표'].unique()
+                sorted_indicators = [i for i in indicator_order if i in present_inds] + [i for i in sorted(present_inds) if i not in indicator_order]
                 
-                selected_inds = st.multiselect("확인할 지표를 선택하세요", all_inds, default=default_selection)
+                # 3. 기본 선택 지표 설정
+                default_selection = [i for i in ['GDP(연간)', 'GDP(분기)', '기준금리', 'CPI'] if i in sorted_indicators]
+                
+                selected_inds = st.multiselect("확인할 지표를 선택하세요", sorted_indicators, default=default_selection)
                 
                 if selected_inds:
                     cols = st.columns(2)
