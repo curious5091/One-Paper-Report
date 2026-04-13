@@ -70,9 +70,13 @@ if st.session_state.view_mode:
             df = get_clean_data()
             now = datetime.now(timezone('Asia/Seoul')).strftime("%Y-%m-%d %H:%M")
 
-            # 정렬 기준 정의
+            # 정렬 기준 정의 (사용자 요청 반영)
             country_order = ['한국', '미국', '중국', '일본', '유로존', '베트남', '인도', '인도네시아', '폴란드']
-            indicator_order = ['GDP(연간)', 'GDP(분기)', '기준금리', '실업률', 'PCE', 'CPI', 'PPI', '무역수지', '수출', '수입', '소매판매', '산업생산', '부동산투자', '실질임금']
+            indicator_order = [
+                'GDP(연간)', 'GDP(분기)', '기준금리', '실업률', 'PCE', 'CPI', 'PPI', 
+                '무역수지', '수출', '수입', '소매판매', '산업생산', '건설투자', '설비투자', '부동산투자', '실질임금'
+            ]
+            indicator_sort_dict = {ind: i for i, ind in enumerate(indicator_order)}
 
             # --- [MODE 1] 인쇄용 리포트 ---
             if st.session_state.view_mode == 'report':
@@ -84,17 +88,20 @@ if st.session_state.view_mode:
                     freq = group['빈도'].iloc[0]
                     n = 8 if i_name == 'GDP(분기)' else (4 if freq in ['연도', '분기'] else 12)
                     recent_data = group.sort_values('기준시점', ascending=False).head(n)
-                    key = (c_name, i_name)
-                    meta[key] = (recent_data.iloc[0]['단위'], recent_data.iloc[0]['기준점'], freq)
-                    for _, row in recent_data.iterrows():
-                        val = row['값']
-                        try:
-                            f_val = f"{float(val):,.2f}" if i_name == '기준금리' else f"{float(val):,.1f}"
-                        except: f_val = ""
-                        value_map[key][row['기준시점_text']] = f_val
+                    
+                    # 데이터가 유효한 경우에만 맵에 추가
+                    if not recent_data.empty and recent_data['값'].notna().any():
+                        key = (c_name, i_name)
+                        meta[key] = (recent_data.iloc[0]['단위'], recent_data.iloc[0]['기준점'], freq)
+                        for _, row in recent_data.iterrows():
+                            val = row['값']
+                            if pd.notna(val):
+                                try:
+                                    f_val = f"{float(val):,.2f}" if i_name == '기준금리' else f"{float(val):,.1f}"
+                                    value_map[key][row['기준시점_text']] = f_val
+                                except: pass
 
                 omit_base = {'기준금리'}
-                
                 all_found_countries = df['국가'].unique()
                 display_order = [c for c in country_order if c in all_found_countries] + [c for c in sorted(all_found_countries) if c not in country_order]
                 
@@ -117,7 +124,6 @@ if st.session_state.view_mode:
                 </style></head><body>
                 <div class="print-button-container">
                     <button class="print-button" onclick="window.print()">🖨️ 인쇄 또는 PDF 저장</button>
-                    <p style="font-size:8pt; color:#666; margin-top:5px;">* PDF 저장 시 '배경 그래픽' 옵션을 체크해 주세요.</p>
                 </div>
                 <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom:5px;">
                     <img src="https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png" style="height:34px;" />
@@ -128,29 +134,36 @@ if st.session_state.view_mode:
                 
                 for country in display_order:
                     bg_color = color_map.get(country, '#ffffff')
+                    # 해당 국가에 데이터가 하나라도 있는지 확인
+                    country_keys = [k for k in value_map if k[0] == country]
+                    if not country_keys: continue
+
                     html += f'<div style="background-color:{bg_color}; padding:8px; margin-bottom:15px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
                     
+                    # GDP 섹션 (데이터가 있을 때만)
                     key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
-                    if key_y in value_map or key_q in value_map:
-                        periods_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1]
-                        periods_q = sorted(value_map[key_q].keys(), reverse=True)[:8][::-1]
+                    show_y = key_y in value_map and value_map[key_y]
+                    show_q = key_q in value_map and value_map[key_q]
+                    
+                    if show_y or show_q:
+                        p_y = sorted(value_map[key_y].keys(), reverse=True)[:4][::-1] if show_y else []
+                        p_q = sorted(value_map[key_q].keys(), reverse=True)[:8][::-1] if show_q else []
                         html += '<table><tr>'
-                        if periods_y: html += f'<th colspan="{len(periods_y)}"><b>GDP(연간)</b> ({meta[key_y][0]})</th>'
-                        if periods_q: html += f'<th colspan="{len(periods_q)}"><b>GDP(분기)</b> ({meta[key_q][0]})</th>'
-                        html += '</tr><tr>' + ''.join(f'<th>{p}</th>' for p in periods_y + periods_q) + '</tr><tr>'
-                        html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in periods_y)
-                        html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in periods_q)
+                        if p_y: html += f'<th colspan="{len(p_y)}"><b>GDP(연간)</b> ({meta[key_y][0]})</th>'
+                        if p_q: html += f'<th colspan="{len(p_q)}"><b>GDP(분기)</b> ({meta[key_q][0]})</th>'
+                        html += '</tr><tr>' + ''.join(f'<th>{p}</th>' for p in p_y + p_q) + '</tr><tr>'
+                        html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in p_y)
+                        html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in p_q)
                         html += '</tr></table>'
 
-                    keys = [k for k in value_map if k[0] == country and k[1] not in ['GDP(연간)', 'GDP(분기)']]
-                    if keys:
-                        all_p = sorted({p for k in keys for p in value_map[k]}, reverse=True)[:12][::-1]
+                    # 주요 지표 섹션 (데이터가 있을 때만)
+                    other_keys = [k for k in country_keys if k[1] not in ['GDP(연간)', 'GDP(분기)']]
+                    if other_keys:
+                        all_p = sorted({p for k in other_keys for p in value_map[k]}, reverse=True)[:12][::-1]
                         html += '<table><tr><th style="width:150px;">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_p) + '</tr>'
-                        
-                        # 인쇄용 리포트 지표 정렬 (기존 유지 혹은 통일)
-                        report_sort = {ind: i for i, ind in enumerate(indicator_order)}
-                        for k in sorted(keys, key=lambda x: report_sort.get(x[1], 99)):
+                        for k in sorted(other_keys, key=lambda x: indicator_sort_dict.get(x[1], 99)):
+                            if not value_map[k]: continue # 개별 지표 데이터 체크
                             unit, base, _ = meta[k]
                             b_text = f", {base}" if k[1] not in omit_base and not pd.isna(base) and base != '-' else ""
                             html += f'<tr><td style="text-align:left; padding-left:5px;"><b>{k[1]}</b> <span style="font-size:7pt;">({unit}{b_text})</span></td>'
@@ -166,20 +179,17 @@ if st.session_state.view_mode:
             elif st.session_state.view_mode == 'dashboard':
                 st.subheader("📊 경제 지표 시각화 대시보드")
                 
-                # 1. 국가 드롭다운 순서 고정
                 all_found_countries = df['국가'].unique()
                 sorted_countries = [c for c in country_order if c in all_found_countries] + [c for c in sorted(all_found_countries) if c not in country_order]
                 target_country = st.selectbox("조회할 국가를 선택하세요", sorted_countries)
                 
-                c_df = df[df['국가'] == target_country].copy()
+                c_df = df[(df['국가'] == target_country) & (df['값'].notna())].copy()
                 
-                # 2. 해당 국가에 존재하는 지표만 필터링하여 순서 고정
+                # 해당 국가에 실제 데이터가 존재하는 지표만 필터링 및 정렬
                 present_inds = c_df['지표'].unique()
                 sorted_indicators = [i for i in indicator_order if i in present_inds] + [i for i in sorted(present_inds) if i not in indicator_order]
                 
-                # 3. 기본 선택 지표 설정
                 default_selection = [i for i in ['GDP(연간)', 'GDP(분기)', '기준금리', 'CPI'] if i in sorted_indicators]
-                
                 selected_inds = st.multiselect("확인할 지표를 선택하세요", sorted_indicators, default=default_selection)
                 
                 if selected_inds:
@@ -206,7 +216,7 @@ if st.session_state.view_mode:
                                     'height': 300
                                 })
                 else:
-                    st.warning("지표를 선택해주세요.")
+                    st.warning("데이터가 있는 지표가 없습니다.")
 
         except Exception as e:
             st.error("데이터 처리 중 오류 발생")
