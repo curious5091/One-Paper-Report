@@ -108,7 +108,7 @@ if run_button:
             .page-break {{ page-break-before: always; }}
             @media print {{ .print-button {{ display: none !important; }} }}
             </style></head><body>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom:2px;">  <img src="https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png]" style="height:34px;" />  <div style="font-size:13pt; font-weight: bold;">One Page Economic Report - IBK ERI</div></div><div style="text-align:center; font-size:8.5pt;">기준일시: {now} 기준</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom:2px;">  <img src="https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png" style="height:34px;" />  <div style="font-size:13pt; font-weight: bold;">One Page Economic Report - IBK ERI</div></div><div style="text-align:center; font-size:8.5pt;">기준일시: {now} 기준</div>
             <div class="print-button" style="text-align:right; margin: 10px 0;">
               <button onclick="window.print()" style="padding:6px 12px; font-size:10pt; cursor:pointer; border: 2px solid #333; font-weight:bold;">🖨️ 인쇄 또는 PDF 저장</button>
               <p style="font-size:8pt; color:#555; text-align:right; margin-top:6px;">
