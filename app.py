@@ -94,7 +94,13 @@ if st.session_state.view_mode:
                 all_found_countries = sorted(df['국가'].unique())
                 main_countries = ['한국', '미국', '중국', '일본', '유로존']
                 display_order = [c for c in main_countries if c in all_found_countries] + [c for c in all_found_countries if c not in main_countries]
-                color_map = {'한국': '#f9f9f9', '미국': '#e6f0ff', '중국': '#ffe6e6', '일본': '#f3e6ff', '유로존': '#e6ffe6', '베트남': '#fff7e6'}
+                
+                # 색상 지정 부분 수정: 베트남, 인도, 인도네시아, 폴란드에 동일 색상 적용
+                color_map = {
+                    '한국': '#f9f9f9', '미국': '#e6f0ff', '중국': '#ffe6e6', 
+                    '일본': '#f3e6ff', '유로존': '#e6ffe6', 
+                    '베트남': '#fff7e6', '인도': '#fff7e6', '인도네시아': '#fff7e6', '폴란드': '#fff7e6'
+                }
 
                 html = f'''
                 <html><head><style>
