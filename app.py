@@ -23,7 +23,7 @@ st.markdown(f"""
     <div style='display: flex; align-items: center; justify-content: flex-start; gap: 40px; margin-bottom: 25px; flex-wrap: wrap;'>
         <div style='display: flex; align-items: center; gap: 16px;'>
             <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='110'/>
-            <h1 style='font-size:26pt; margin:0;'>One Page Economic Report - IBK ERI   (ver.2.1)</h1>
+            <h1 style='font-size:26pt; margin:0;'>One Page Economic Report - IBK ERI   (ver.2.0)</h1>
         </div>
         <div style='text-align: center; padding: 8px; border: 2px solid #007bff; border-radius: 8px; background-color: #f0f7ff; min-width: 140px;'>
             <img src='{QR_CODE_URL}' width='120' style='display: block; margin: 0 auto; border-radius: 4px;'/>
@@ -64,7 +64,7 @@ def get_clean_data():
     
     # 중복 제거 및 유효 값 필터링
     df_clean = df.sort_values(['국가', '지표', '기준시점', '발표일'], ascending=[True, True, False, False])
-    df_clean = df_clean.drop_duplicates(subset=['국가', '지표', '기준시점_text'], keep='first')
+    df_clean = df_clean.drop_duplicates(subset(['국가', '지표', '기준시점_text'], keep='first') or ['국가', '지표', '기준시점_text'], keep='first')
     df_clean = df_clean[df_clean['값'].notna()]
     
     # [추가] 일본의 경우 '단칸' 지표 제외 로직
@@ -156,7 +156,6 @@ if st.session_state.view_mode:
                 </div>
                 '''
                 
-                # 페이지 분할 제어용 변수 초기화
                 triggered_page_2 = False
                 triggered_page_3 = False
                 countries_printed = 0
@@ -166,14 +165,11 @@ if st.session_state.view_mode:
                     country_keys = [k for k in value_map if k[0] == country]
                     if not country_keys: continue
 
-                    # [페이지 분할 로직] 
-                    # 2페이지 시작점 제어 (중국, 일본, 유로존 그룹의 첫 국가 등장 시)
                     if country in ['중국', '일본', '유로존']:
                         if not triggered_page_2 and countries_printed > 0:
                             html += '<div style="page-break-before: always;"></div>'
                             triggered_page_2 = True
                     
-                    # 3페이지 시작점 제어 (나머지 국가 그룹의 첫 국가 등장 시)
                     elif country not in ['한국', '미국', '중국', '일본', '유로존']:
                         if not triggered_page_3 and countries_printed > 0:
                             html += '<div style="page-break-before: always;"></div>'
@@ -194,7 +190,8 @@ if st.session_state.view_mode:
                         html += '<table><tr>'
                         if p_y: html += f'<th colspan="{len(p_y)}"><b>GDP(연간)</b> ({meta[key_y][0]})</th>'
                         if p_q: html += f'<th colspan="{len(p_q)}"><b>GDP(분기)</b> ({meta[key_q][0]})</th>'
-                        html += '</tr><tr>' + ''.join(f'<th>{p}</th>' for p in p_y + p_q) + '</tr><tr>'
+                        # GDP 분기/연간 헤더 텍스트 줄바꿈 방지 적용
+                        html += '</tr><tr>' + ''.join(f'<th style="white-space: nowrap;">{p}</th>' for p in p_y + p_q) + '</tr><tr>'
                         html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in p_y)
                         html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in p_q)
                         html += '</tr></table>'
@@ -202,7 +199,8 @@ if st.session_state.view_mode:
                     other_keys = [k for k in country_keys if k[1] not in ['GDP(연간)', 'GDP(분기)']]
                     if other_keys:
                         all_p = sorted({p for k in other_keys for p in value_map[k]}, reverse=True)[:12][::-1]
-                        html += '<table><tr><th style="width:150px;">지표명</th>' + ''.join(f'<th>{p}</th>' for p in all_p) + '</tr>'
+                        # [수정] 지표명 너비를 150px에서 110px로 줄이고 시계열 헤더(all_p)에 줄바꿈 방지(white-space: nowrap;) 추가
+                        html += '<table><tr><th style="width:110px;">지표명</th>' + ''.join(f'<th style="white-space: nowrap;">{p}</th>' for p in all_p) + '</tr>'
                         for k in sorted(other_keys, key=lambda x: indicator_sort_dict.get(x[1], 99)):
                             unit, base, _ = meta[k]
                             b_text = f", {base}" if k[1] not in omit_base and not pd.isna(base) and base != '-' else ""
