@@ -126,7 +126,6 @@ if st.session_state.view_mode:
 
                 html = f'''
                 <html><head><style>
-                /* [수정] 최상단 여백을 20mm에서 12mm로 축소하여 공간 효율성 개선 */
                 @page {{ size: A4 portrait; margin: 12mm 6mm 6mm 6mm; }}
                 body {{ font-family: "Malgun Gothic"; font-size: 10pt; color: #000; -webkit-print-color-adjust: exact; }}
                 table {{ border-collapse: collapse; width: 100%; margin-bottom: 12px; page-break-inside: avoid; }}
@@ -157,10 +156,30 @@ if st.session_state.view_mode:
                 </div>
                 '''
                 
+                # 페이지 분할 제어용 변수 초기화
+                triggered_page_2 = False
+                triggered_page_3 = False
+                countries_printed = 0
+
                 for country in display_order:
                     bg_color = color_map.get(country, '#ffffff')
                     country_keys = [k for k in value_map if k[0] == country]
                     if not country_keys: continue
+
+                    # [페이지 분할 로직] 
+                    # 2페이지 시작점 제어 (중국, 일본, 유로존 그룹의 첫 국가 등장 시)
+                    if country in ['중국', '일본', '유로존']:
+                        if not triggered_page_2 and countries_printed > 0:
+                            html += '<div style="page-break-before: always;"></div>'
+                            triggered_page_2 = True
+                    
+                    # 3페이지 시작점 제어 (나머지 국가 그룹의 첫 국가 등장 시)
+                    elif country not in ['한국', '미국', '중국', '일본', '유로존']:
+                        if not triggered_page_3 and countries_printed > 0:
+                            html += '<div style="page-break-before: always;"></div>'
+                            triggered_page_3 = True
+
+                    countries_printed += 1
 
                     html += f'<div style="background-color:{bg_color}; padding:12px; margin-bottom:30px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
