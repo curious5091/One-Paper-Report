@@ -23,7 +23,7 @@ st.markdown(f"""
     <div style='display: flex; align-items: center; justify-content: flex-start; gap: 40px; margin-bottom: 25px; flex-wrap: wrap;'>
         <div style='display: flex; align-items: center; gap: 16px;'>
             <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='110'/>
-            <h1 style='font-size:26pt; margin:0;'>One Page Economic Report - IBK ERI   (ver.2.0)</h1>
+            <h1 style='font-size:26pt; margin:0;'>One Page Economic Report - IBK ERI   (ver.2.1)</h1>
         </div>
         <div style='text-align: center; padding: 8px; border: 2px solid #007bff; border-radius: 8px; background-color: #f0f7ff; min-width: 140px;'>
             <img src='{QR_CODE_URL}' width='120' style='display: block; margin: 0 auto; border-radius: 4px;'/>
@@ -126,14 +126,12 @@ if st.session_state.view_mode:
 
                 html = f'''
                 <html><head><style>
-                @page {{ size: A4 portrait; margin: 20mm 6mm 6mm 6mm; }}
+                /* [수정] 최상단 여백을 20mm에서 12mm로 축소하여 공간 효율성 개선 */
+                @page {{ size: A4 portrait; margin: 12mm 6mm 6mm 6mm; }}
                 body {{ font-family: "Malgun Gothic"; font-size: 10pt; color: #000; -webkit-print-color-adjust: exact; }}
                 table {{ border-collapse: collapse; width: 100%; margin-bottom: 12px; page-break-inside: avoid; }}
                 th, td {{ border: 1px solid black; padding: 2px; font-size: 8pt; text-align: center; color: #000; }}
-                
-                /* [수정] 국가명 타이틀 글자 크기 확대 및 스타일 강조 */
                 h3 {{ margin: 5px 0 12px 0; font-size: 15pt; font-weight: bold; border-left: 6px solid #222; padding-left: 12px; }}
-                
                 .print-button-container {{ text-align: left; margin-bottom: 25px; }}
                 .print-button {{ padding: 8px 16px; font-weight: bold; cursor: pointer; border: 2px solid #333; background: #fff; border-radius: 4px; }}
                 @media print {{ .print-button-container {{ display: none !important; }} }}
@@ -164,7 +162,6 @@ if st.session_state.view_mode:
                     country_keys = [k for k in value_map if k[0] == country]
                     if not country_keys: continue
 
-                    # [수정] 박스 간 하단 마진을 15px에서 30px로 확장, 안쪽 내부 패딩을 12px로 늘려 쾌적한 공간 확보
                     html += f'<div style="background-color:{bg_color}; padding:12px; margin-bottom:30px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
                     
