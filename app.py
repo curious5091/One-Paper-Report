@@ -64,7 +64,8 @@ def get_clean_data():
     
     # 중복 제거 및 유효 값 필터링
     df_clean = df.sort_values(['국가', '지표', '기준시점', '발표일'], ascending=[True, True, False, False])
-    df_clean = df_clean.drop_duplicates(subset(['국가', '지표', '기준시점_text'], keep='first') or ['국가', '지표', '기준시점_text'], keep='first')
+    # [수정 완료] 오타 구문을 정상적인 pandas 중복 제거 코드로 복구했습니다.
+    df_clean = df_clean.drop_duplicates(subset=['국가', '지표', '기준시점_text'], keep='first')
     df_clean = df_clean[df_clean['값'].notna()]
     
     # [추가] 일본의 경우 '단칸' 지표 제외 로직
@@ -190,7 +191,6 @@ if st.session_state.view_mode:
                         html += '<table><tr>'
                         if p_y: html += f'<th colspan="{len(p_y)}"><b>GDP(연간)</b> ({meta[key_y][0]})</th>'
                         if p_q: html += f'<th colspan="{len(p_q)}"><b>GDP(분기)</b> ({meta[key_q][0]})</th>'
-                        # GDP 분기/연간 헤더 텍스트 줄바꿈 방지 적용
                         html += '</tr><tr>' + ''.join(f'<th style="white-space: nowrap;">{p}</th>' for p in p_y + p_q) + '</tr><tr>'
                         html += ''.join(f'<td>{value_map[key_y].get(p, "")}</td>' for p in p_y)
                         html += ''.join(f'<td>{value_map[key_q].get(p, "")}</td>' for p in p_q)
@@ -199,7 +199,6 @@ if st.session_state.view_mode:
                     other_keys = [k for k in country_keys if k[1] not in ['GDP(연간)', 'GDP(분기)']]
                     if other_keys:
                         all_p = sorted({p for k in other_keys for p in value_map[k]}, reverse=True)[:12][::-1]
-                        # [수정] 지표명 너비를 150px에서 110px로 줄이고 시계열 헤더(all_p)에 줄바꿈 방지(white-space: nowrap;) 추가
                         html += '<table><tr><th style="width:110px;">지표명</th>' + ''.join(f'<th style="white-space: nowrap;">{p}</th>' for p in all_p) + '</tr>'
                         for k in sorted(other_keys, key=lambda x: indicator_sort_dict.get(x[1], 99)):
                             unit, base, _ = meta[k]
