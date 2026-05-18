@@ -18,7 +18,7 @@ st.set_page_config(page_title="One Page Economic Report - IBK ERI", layout="wide
 # 업로드하신 QR 코드 이미지의 Raw 링크 설정
 QR_CODE_URL = "https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/QR_ibk_eri_bot.png"
 
-# 화면 표시용 헤더 (정렬 방식 변경 및 크기 확대)
+# [메인 페이지] 화면 표시용 헤더
 st.markdown(f"""
     <div style='display: flex; align-items: center; justify-content: flex-start; gap: 40px; margin-bottom: 25px; flex-wrap: wrap;'>
         <div style='display: flex; align-items: center; gap: 16px;'>
@@ -138,11 +138,21 @@ if st.session_state.view_mode:
                 <div class="print-button-container">
                     <button class="print-button" onclick="window.print()">🖨️ 인쇄 또는 PDF 저장</button>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom:5px;">
-                    <img src="https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png" style="height:34px;" />
-                    <div style="font-size:13pt; font-weight: bold;">One Page Economic Report - IBK ERI</div>
+                
+                <!-- 인쇄용 고해상도 헤더 영역 (제목 확대, QR 배치, 여백 확보) -->
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 35px;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <img src="https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png" style="height:45px;" />
+                        <div>
+                            <div style="font-size:20pt; font-weight: bold; color:#000; letter-spacing: -0.5px;">One Page Economic Report - IBK ERI</div>
+                            <div style="font-size:9pt; color:#444; margin-top: 4px;">기준일시: {now}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; min-width: 80px;">
+                        <img src="{QR_CODE_URL}" style="height: 70px; width: 70px; display: block; margin: 0 auto; border: 1px solid #ccc; padding: 2px; background: #fff;" />
+                        <span style="font-size: 7.5pt; color: #000; display: block; margin-top: 3px; font-weight: bold;">모바일 봇</span>
+                    </div>
                 </div>
-                <div style="text-align:center; font-size:8.5pt; margin-bottom:15px;">기준일시: {now}</div>
                 '''
                 
                 for country in display_order:
