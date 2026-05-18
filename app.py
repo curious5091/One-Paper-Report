@@ -126,20 +126,24 @@ if st.session_state.view_mode:
 
                 html = f'''
                 <html><head><style>
-                @page {{ size: A4 portrait; margin: 5mm; }}
+                @page {{ size: A4 portrait; margin: 20mm 6mm 6mm 6mm; }}
                 body {{ font-family: "Malgun Gothic"; font-size: 10pt; color: #000; -webkit-print-color-adjust: exact; }}
-                table {{ border-collapse: collapse; width: 100%; margin-bottom: 8px; page-break-inside: avoid; }}
+                table {{ border-collapse: collapse; width: 100%; margin-bottom: 12px; page-break-inside: avoid; }}
                 th, td {{ border: 1px solid black; padding: 2px; font-size: 8pt; text-align: center; color: #000; }}
-                h3 {{ margin: 10px 0 5px 0; font-size: 11pt; border-left: 5px solid #333; padding-left: 10px; }}
-                .print-button-container {{ text-align: right; margin-bottom: 20px; }}
-                .print-button {{ padding: 8px 16px; font-weight: bold; cursor: pointer; border: 2px solid #333; background: #fff; }}
+                
+                /* [수정] 국가명 타이틀 글자 크기 확대 및 스타일 강조 */
+                h3 {{ margin: 5px 0 12px 0; font-size: 15pt; font-weight: bold; border-left: 6px solid #222; padding-left: 12px; }}
+                
+                .print-button-container {{ text-align: left; margin-bottom: 25px; }}
+                .print-button {{ padding: 8px 16px; font-weight: bold; cursor: pointer; border: 2px solid #333; background: #fff; border-radius: 4px; }}
                 @media print {{ .print-button-container {{ display: none !important; }} }}
                 </style></head><body>
+                
                 <div class="print-button-container">
                     <button class="print-button" onclick="window.print()">🖨️ 인쇄 또는 PDF 저장</button>
                 </div>
                 
-                <!-- 인쇄용 고해상도 헤더 영역 (제목 확대, QR 배치, 여백 확보) -->
+                <!-- 인쇄용 고해상도 헤더 영역 -->
                 <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 35px;">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <img src="https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png" style="height:45px;" />
@@ -160,7 +164,8 @@ if st.session_state.view_mode:
                     country_keys = [k for k in value_map if k[0] == country]
                     if not country_keys: continue
 
-                    html += f'<div style="background-color:{bg_color}; padding:8px; margin-bottom:15px; border:1px solid #ddd; page-break-inside: avoid;">'
+                    # [수정] 박스 간 하단 마진을 15px에서 30px로 확장, 안쪽 내부 패딩을 12px로 늘려 쾌적한 공간 확보
+                    html += f'<div style="background-color:{bg_color}; padding:12px; margin-bottom:30px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
                     
                     key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
