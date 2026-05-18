@@ -9,7 +9,7 @@ from datetime import datetime
 from pytz import timezone
 
 # 1. 인증 및 설정
-scope = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+scope = ["https://www.googleapis.com/auth/sharedsheets.readonly"]
 credentials = Credentials.from_service_account_info(st.secrets["gcp"], scopes=scope)
 gc = gspread.authorize(credentials)
 
@@ -23,7 +23,7 @@ st.markdown(f"""
     <div style='display: flex; align-items: center; justify-content: flex-start; gap: 40px; margin-bottom: 25px; flex-wrap: wrap;'>
         <div style='display: flex; align-items: center; gap: 16px;'>
             <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='110'/>
-            <h1 style='font-size:26pt; margin:0;'>One Page Economic Report - IBK ERI   (ver.2.0)</h1>
+            <h1 style='font-size:26pt; margin:0;'>One Page Economic Report - IBK ERI   (ver.2.1)</h1>
         </div>
         <div style='text-align: center; padding: 8px; border: 2px solid #007bff; border-radius: 8px; background-color: #f0f7ff; min-width: 140px;'>
             <img src='{QR_CODE_URL}' width='120' style='display: block; margin: 0 auto; border-radius: 4px;'/>
@@ -64,7 +64,6 @@ def get_clean_data():
     
     # 중복 제거 및 유효 값 필터링
     df_clean = df.sort_values(['국가', '지표', '기준시점', '발표일'], ascending=[True, True, False, False])
-    # [수정 완료] 오타 구문을 정상적인 pandas 중복 제거 코드로 복구했습니다.
     df_clean = df_clean.drop_duplicates(subset=['국가', '지표', '기준시점_text'], keep='first')
     df_clean = df_clean[df_clean['값'].notna()]
     
@@ -129,9 +128,14 @@ if st.session_state.view_mode:
                 <html><head><style>
                 @page {{ size: A4 portrait; margin: 12mm 6mm 6mm 6mm; }}
                 body {{ font-family: "Malgun Gothic"; font-size: 10pt; color: #000; -webkit-print-color-adjust: exact; }}
-                table {{ border-collapse: collapse; width: 100%; margin-bottom: 12px; page-break-inside: avoid; }}
+                
+                /* [수정] 테이블 하단 여백 축소 (12px -> 6px) */
+                table {{ border-collapse: collapse; width: 100%; margin-bottom: 6px; page-break-inside: avoid; }}
                 th, td {{ border: 1px solid black; padding: 2px; font-size: 8pt; text-align: center; color: #000; }}
-                h3 {{ margin: 5px 0 12px 0; font-size: 15pt; font-weight: bold; border-left: 6px solid #222; padding-left: 12px; }}
+                
+                /* [수정] h3 타이틀의 상하 마진 축소 (위 아래 유격을 타이트하게 고정) */
+                h3 {{ margin: 2px 0 6px 0; font-size: 15pt; font-weight: bold; border-left: 6px solid #222; padding-left: 12px; }}
+                
                 .print-button-container {{ text-align: left; margin-bottom: 25px; }}
                 .print-button {{ padding: 8px 16px; font-weight: bold; cursor: pointer; border: 2px solid #333; background: #fff; border-radius: 4px; }}
                 @media print {{ .print-button-container {{ display: none !important; }} }}
@@ -178,7 +182,8 @@ if st.session_state.view_mode:
 
                     countries_printed += 1
 
-                    html += f'<div style="background-color:{bg_color}; padding:12px; margin-bottom:30px; border:1px solid #ddd; page-break-inside: avoid;">'
+                    # [수정] 박스 자체의 상하 패딩(12px -> 6px) 및 하단 외부 여백(30px -> 20px) 축소로 슬림화 조치
+                    html += f'<div style="background-color:{bg_color}; padding: 6px 12px; margin-bottom:20px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
                     
                     key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
