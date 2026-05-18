@@ -18,16 +18,16 @@ st.set_page_config(page_title="One Page Economic Report - IBK ERI", layout="wide
 # 업로드하신 QR 코드 이미지의 Raw 링크 설정
 QR_CODE_URL = "https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/QR_ibk_eri_bot.png"
 
-# 화면 표시용 헤더 (우측 끝에 업로드하신 QR 코드 배치)
+# 화면 표시용 헤더 (정렬 방식 변경 및 크기 확대)
 st.markdown(f"""
-    <div style='display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px;'>
-        <div style='display: flex; align-items: center; gap: 12px;'>
-            <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='100'/>
-            <h1 style='font-size:24pt; margin:0;'>One Page Economic Report - IBK ERI   (ver.2.0)</h1>
+    <div style='display: flex; align-items: center; justify-content: flex-start; gap: 40px; margin-bottom: 25px; flex-wrap: wrap;'>
+        <div style='display: flex; align-items: center; gap: 16px;'>
+            <img src='https://raw.githubusercontent.com/curious5091/One-Paper-Report/main/ibk_eri_oper.png' width='110'/>
+            <h1 style='font-size:26pt; margin:0;'>One Page Economic Report - IBK ERI   (ver.2.0)</h1>
         </div>
-        <div style='text-align: center; padding: 5px; border: 1px solid #e0e0e0; border-radius: 4px; background-color: #fafafa;'>
-            <img src='{QR_CODE_URL}' width='85' style='display: block; margin: 0 auto;'/>
-            <span style='font-size:8pt; color:#555; font-weight: bold; display: block; margin-top: 4px;'>모바일 접속</span>
+        <div style='text-align: center; padding: 8px; border: 2px solid #007bff; border-radius: 8px; background-color: #f0f7ff; min-width: 140px;'>
+            <img src='{QR_CODE_URL}' width='120' style='display: block; margin: 0 auto; border-radius: 4px;'/>
+            <span style='font-size:9pt; color:#007bff; font-weight: bold; display: block; margin-top: 6px;'>모바일 실시간 봇</span>
         </div>
     </div>
 """, unsafe_allow_html=True)
