@@ -64,7 +64,6 @@ def get_clean_data():
     
     # 중복 제거 및 유효 값 필터링
     df_clean = df.sort_values(['국가', '지표', '기준시점', '발표일'], ascending=[True, True, False, False])
-    # [수정 완료] 오타 구문을 정상적인 pandas 중복 제거 코드로 복구했습니다.
     df_clean = df_clean.drop_duplicates(subset=['국가', '지표', '기준시점_text'], keep='first')
     df_clean = df_clean[df_clean['값'].notna()]
     
@@ -129,9 +128,14 @@ if st.session_state.view_mode:
                 <html><head><style>
                 @page {{ size: A4 portrait; margin: 12mm 6mm 6mm 6mm; }}
                 body {{ font-family: "Malgun Gothic"; font-size: 10pt; color: #000; -webkit-print-color-adjust: exact; }}
-                table {{ border-collapse: collapse; width: 100%; margin-bottom: 12px; page-break-inside: avoid; }}
+                
+                /* [간격 조정] 테이블 자체의 하단 마진 축소 */
+                table {{ border-collapse: collapse; width: 100%; margin-bottom: 6px; page-break-inside: avoid; }}
                 th, td {{ border: 1px solid black; padding: 2px; font-size: 8pt; text-align: center; color: #000; }}
-                h3 {{ margin: 5px 0 12px 0; font-size: 15pt; font-weight: bold; border-left: 6px solid #222; padding-left: 12px; }}
+                
+                /* [간격 조정] 국가명 h3 타이틀의 상하 마진 여백을 슬림하게 축소 */
+                h3 {{ margin: 2px 0 6px 0; font-size: 15pt; font-weight: bold; border-left: 6px solid #222; padding-left: 12px; }}
+                
                 .print-button-container {{ text-align: left; margin-bottom: 25px; }}
                 .print-button {{ padding: 8px 16px; font-weight: bold; cursor: pointer; border: 2px solid #333; background: #fff; border-radius: 4px; }}
                 @media print {{ .print-button-container {{ display: none !important; }} }}
@@ -178,7 +182,8 @@ if st.session_state.view_mode:
 
                     countries_printed += 1
 
-                    html += f'<div style="background-color:{bg_color}; padding:12px; margin-bottom:30px; border:1px solid #ddd; page-break-inside: avoid;">'
+                    # [간격 조정] 박스 자체의 상하 패딩을 12px에서 5px로 줄여 내부 공백을 타이트하게 조절
+                    html += f'<div style="background-color:{bg_color}; padding: 5px 12px; margin-bottom:24px; border:1px solid #ddd; page-break-inside: avoid;">'
                     html += f'<h3>{country}</h3>'
                     
                     key_y, key_q = (country, 'GDP(연간)'), (country, 'GDP(분기)')
